@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --primary: 213 94% 68%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 40% 98%;
+    --accent: 210 40% 12%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 213 94% 68%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 217 33% 3%;
+    --foreground: 210 40% 98%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 223 47% 11%;
+    --accent-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    --border: 217 33% 12%;
+    --input: 217 33% 12%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217 33% 12%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 263.4 70% 50.4%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+  }
+
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md;
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/10 shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-base text-white/90 outline-none transition-all duration-200 placeholder:text-white/60 focus:border-primary/60 focus:bg-white/15 focus:ring-2 focus:ring-primary/40;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .clickable {
+    @apply cursor-pointer transition-transform duration-200 hover:scale-[1.02] active:scale-95;
+  }
+
+  .glass-effect {
+    @apply border border-white/15 bg-white/10 backdrop-blur-lg;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent;
+  }
+
+  .font-delicious {
+    font-family: var(--font-delicious), "Inter", system-ui, sans-serif;
+  }
+
+  .font-joti {
+    font-family: var(--font-joti), "Poppins", system-ui, sans-serif;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(-3%, -2%) rotate(-2deg) scale(1.02);
+    opacity: 0.75;
+  }
+  25% {
+    transform: translate(4%, -6%) rotate(3deg) scale(1.05);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(6%, 5%) rotate(1deg) scale(1.07);
+    opacity: 0.82;
+  }
+  75% {
+    transform: translate(-5%, 6%) rotate(-4deg) scale(1.04);
+    opacity: 0.88;
+  }
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translate(-4%, -3%) rotate(-1deg) scale(1.03);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(5%, -7%) rotate(2deg) scale(1.05);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(7%, 6%) rotate(4deg) scale(1.06);
+    opacity: 0.78;
+  }
+}
+
+@keyframes gradientPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.animate-float {
+  animation: float 24s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 16s ease-in-out infinite;
+}
+
+.animate-gradient-pulse {
+  animation: gradientPulse 3s ease-in-out infinite;
+}
+
+/* You can add global styles to this file, and also import other style files */
+.form-control {
+    border: 1px solid !important;
+}
+.form-select {
+    border: 1px solid !important;
+}

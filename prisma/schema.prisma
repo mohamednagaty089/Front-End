@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Counter {
+  id    String @id @map("_id") @db.ObjectId @default(auto())
+  key   String @unique
+  value Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DepartmentParent {
+  id             String   @id @map("_id") @db.ObjectId @default(auto())
+  departmentId   Int      @unique
+  departmentName String
+  departmentLogo String?
+  description    String?
+  leadContact    String?
+  leadEmail      String?
+  leadPhone      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentName])
+}
+
+model DepartmentChild {
+  id             String   @id @map("_id") @db.ObjectId @default(auto())
+  childDeptId    Int      @unique
+  departmentName String
+  parentDeptId   Int
+  description    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentDeptId])
+  @@index([departmentName])
+}
+
+model Employee {
+  id            String   @id @map("_id") @db.ObjectId @default(auto())
+  employeeId    Int      @unique
+  employeeName  String
+  contactNo     String?
+  emailId       String?
+  deptId        Int?
+  department    String?
+  password      String?
+  gender        String?
+  role          String?
+  title         String?
+  avatarUrl     String?
+  location      String?
+  timezone      String?
+  employmentType String?
+  managerId     Int?
+  hireDate      DateTime?
+  bio           String?
+  about         String?
+  notes         String?
+  tags          String[]
+  skills        String[]
+  certifications String[]
+  interests     String[]
+  languages     String[]
+  socialLinks   Json?
+  workPreferences Json?
+  availability  Json?
+  preferences   Json?
+  performanceSnapshot Json?
+  documents     Json?
+  customFields  Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean @default(true)
+  lastActiveAt DateTime?
+
+  @@index([deptId])
+  @@index([employeeName])
+  @@index([managerId])
+}
+
+model Project {
+  id             String   @id @map("_id") @db.ObjectId @default(auto())
+  projectId      Int      @unique
+  projectName    String
+  clientName     String?
+  clientIndustry String?
+  startDate      DateTime?
+  endDate        DateTime?
+  leadByEmpId    Int?
+  sponsorEmpId   Int?
+  contactPerson  String?
+  contactNo      String?
+  emailId        String?
+  contactTitle   String?
+  contactNotes   String?
+  overview       Json?
+  scope          Json?
+  successMetrics Json?
+  status         String   @default("draft")
+  statusReason   String?
+  statusHistory  Json?
+  timeline       Json?
+  milestones     Json?
+  categories     String[]
+  tags           String[]
+  focusAreas     String[]
+  blockers       Json?
+  risks          Json?
+  riskRegister   Json?
+  budget         Json?
+  financials     Json?
+  resourcesPlan  Json?
+  readinessChecklist Json?
+  readinessScore Float?
+  approvalStatus String   @default("draft")
+  approvalRequestedAt DateTime?
+  approvalRequestedBy Int?
+  approvalResolvedAt DateTime?
+  approvalResolvedBy Int?
+  approvalReason String?
+  approvalNotes Json?
+  reviewerComments Json?
+  progress       Int?
+  health         String?
+  documents      Json?
+  externalLinks  Json?
+  aiGeneratedInsights Json?
+  cmsContentRefs Json?
+  lastSyncedAt   DateTime?
+  stageGate      Json?
+  governance     Json?
+  communicationPlan Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  archivedAt DateTime?
+
+  @@index([leadByEmpId])
+  @@index([projectName])
+  @@index([status])
+}
+
+model ProjectEmployee {
+  id               String   @id @map("_id") @db.ObjectId @default(auto())
+  empProjectId     Int      @unique
+  projectId        Int
+  empId            Int
+  assignedDate     DateTime?
+  role             String?
+  isActive         Boolean  @default(true)
+  allocationPct    Int?
+  billable         Boolean?
+  billingRate      Float?
+  costRate         Float?
+  notes            String?
+  responsibilities String[]
+  skillsApplied    String[]
+  toolsUsed        String[]
+  schedule         Json?
+  contribution     Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  unassignedAt DateTime?
+
+  @@index([projectId])
+  @@index([empId])
+}

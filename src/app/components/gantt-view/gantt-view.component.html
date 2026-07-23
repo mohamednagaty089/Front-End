@@ -1,0 +1,160 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <h3 class="text-lg font-semibold text-white">Gantt Chart</h3>
+    <p class="text-sm text-white/60">
+      {{ sortedProjects().length }} projects
+    </p>
+  </div>
+
+  <!-- Gantt Chart Container -->
+  <div class="overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-4">
+    <div class="min-w-[800px]">
+      <!-- Month Header -->
+      <div class="relative mb-4 border-b border-white/10 overflow-hidden" style="min-height: 48px;">
+        <div
+          *ngFor="let month of getMonthLabels()"
+          class="absolute border-l border-white/10 pl-2 text-xs text-white/60 whitespace-nowrap"
+          [style.left.%]="month.position"
+          style="top: 0;"
+        >
+          <div class="font-semibold text-white/80">{{ month.month }}</div>
+          <div class="text-white/50 text-[10px] mt-0.5">{{ month.year }}</div>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <div class="space-y-2">
+        <div
+          *ngFor="let project of sortedProjects()"
+          class="relative flex items-center gap-4"
+        >
+          <!-- Project Name -->
+          <div class="w-48 flex-shrink-0">
+            <h4
+              (click)="navigateToProject(project.projectId)"
+              class="cursor-pointer truncate text-sm font-medium text-white transition-colors hover:text-primary"
+              [title]="project.projectName"
+            >
+              {{ project.projectName }}
+            </h4>
+            <p class="truncate text-xs text-white/60">
+              {{ project.clientName }}
+            </p>
+          </div>
+
+          <!-- Gantt Bar Container -->
+          <div class="relative flex-1 min-w-0">
+            <div
+              class="relative h-12 rounded-lg border border-white/10 bg-white/5 overflow-visible"
+            >
+              <!-- Gantt Bar -->
+              <div
+                [attr.data-project-id]="project.projectId"
+                class="absolute top-1 h-10 rounded-md transition-all hover:opacity-90 hover:shadow-lg cursor-pointer z-10"
+                [class]="getStatusColor(project.status) + ' hover:scale-[1.02]'"
+                [style.left.%]="getProjectLeft(project)"
+                [style.width.%]="getProjectWidth(project)"
+                (mouseenter)="showTooltip = project.projectId; updateTooltipPosition(project, $event)"
+                (mouseleave)="showTooltip = null"
+                (click)="navigateToProject(project.projectId)"
+              >
+                <div
+                  class="flex h-full items-center px-2 text-xs font-medium text-white pointer-events-none"
+                >
+                  <span class="truncate">{{ project.projectName }}</span>
+                </div>
+              </div>
+              
+              <!-- Hover Tooltip (positioned relative to bar center, with smart positioning) -->
+              <div
+                *ngIf="showTooltip === project.projectId"
+                class="fixed z-[100] whitespace-nowrap pointer-events-none"
+                [style.left.px]="tooltipPosition.left"
+                [style.top.px]="tooltipPosition.top"
+                style="transform: translateX(-50%); max-width: 90vw;"
+              >
+                <div
+                  class="rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
+                >
+                  <div class="font-semibold text-sm mb-1">{{ project.projectName }}</div>
+                  <div class="text-white/60 mb-1">{{ project.clientName }}</div>
+                  <div class="border-t border-white/10 pt-1 mt-1 space-y-0.5">
+                    <div class="text-white/60">
+                      <span class="font-medium text-white">Start:</span>
+                      {{ project.start | date : 'MMM d, y' }}
+                    </div>
+                    <div class="text-white/60" *ngIf="project.end">
+                      <span class="font-medium text-white">End:</span>
+                      {{ project.end | date : 'MMM d, y' }}
+                    </div>
+                    <div class="text-white/60" *ngIf="!project.end">
+                      <span class="font-medium text-white">Status:</span>
+                      Ongoing
+                    </div>
+                    <div class="text-white/60">
+                      <span class="font-medium text-white">Duration:</span>
+                      {{ getDurationDisplay(project) }}
+                    </div>
+                    <div class="text-white/60">
+                      <span class="font-medium text-white">Status:</span>
+                      {{ project.status }}
+                    </div>
+                    <div class="text-white/60">
+                      <span class="font-medium text-white">Lead:</span>
+                      {{ project.leadName }} ({{ project.leadDepartment }})
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Info -->
+          <div class="w-40 flex-shrink-0 text-right text-xs">
+            <div class="text-white/80 font-medium">
+              {{ getDurationDisplay(project) }}
+            </div>
+            <div class="mt-1 text-white/60">
+              {{ project.start | date : 'MMM d' }}
+              <span *ngIf="project.end">
+                - {{ project.end | date : 'MMM d' }}
+              </span>
+              <span *ngIf="!project.end" class="text-yellow-400">• Ongoing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="mt-6 rounded-lg border border-white/10 bg-white/5 p-4">
+    <h4 class="mb-3 text-sm font-semibold text-white">Status Legend</h4>
+    <div class="flex flex-wrap gap-4 text-xs">
+      <div class="flex items-center gap-2">
+        <div class="h-3 w-3 rounded-full bg-green-500"></div>
+        <span class="text-white/80">Approved/Completed</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="h-3 w-3 rounded-full bg-blue-500"></div>
+        <span class="text-white/80">In Progress/In Review</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
+        <span class="text-white/80">On Hold</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="h-3 w-3 rounded-full bg-red-500"></div>
+        <span class="text-white/80">Cancelled/Rejected</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="h-3 w-3 rounded-full bg-gray-500"></div>
+        <span class="text-white/80">Draft</span>
+      </div>
+    </div>
+    <p class="mt-3 text-xs text-white/60">
+      💡 <span class="font-medium">Tip:</span> Hover over any project bar to see detailed information, or click to view the full project details.
+    </p>
+  </div>
+</div>
+

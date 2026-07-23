@@ -1,0 +1,356 @@
+<div class="space-y-6 text-white/85">
+  <!-- Header -->
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-white">API Status</h1>
+      <p class="text-sm text-white/60 mt-1">
+        Monitor API health, performance, and activity in real-time
+      </p>
+    </div>
+    <button
+      (click)="loadApiStatus()"
+      [disabled]="loading()"
+      class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+    >
+      {{ loading() ? 'Refreshing...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading() && !status()" class="text-center text-white/60 py-12">
+    Loading API status...
+  </div>
+
+  <!-- Error State -->
+  <div
+    *ngIf="error()"
+    class="rounded-[26px] border border-red-500/30 bg-red-500/10 p-6 text-center text-red-400"
+  >
+    {{ error() }}
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading() && !error() && status()" class="space-y-6">
+    <!-- Overall Status Card -->
+    <div
+      class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-white mb-2">Overall Status</h2>
+          <div class="flex items-center gap-3">
+            <span
+              class="inline-flex rounded-full border px-3 py-1 text-sm font-medium capitalize"
+              [class]="overallHealthBg()"
+            >
+              {{ status()?.overallStatus }}
+            </span>
+            <span class="text-sm text-white/60">
+              Last updated: {{ formatTimestamp(status()!.timestamp) }}
+            </span>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-bold" [class]="overallHealthColor()">
+            {{ status()?.metrics?.successRate ?? 0 }}%
+          </div>
+          <div class="text-xs text-white/60">Success Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+      >
+        <div class="text-sm text-white/60 mb-1">Total Endpoints</div>
+        <div class="text-2xl font-bold text-white">
+          {{ status()?.metrics?.totalEndpoints ?? 0 }}
+        </div>
+        <div class="text-xs text-green-400 mt-1">
+          {{ status()?.metrics?.activeEndpoints ?? 0 }} active
+        </div>
+      </div>
+      <div
+        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+      >
+        <div class="text-sm text-white/60 mb-1">Avg Response Time</div>
+        <div class="text-2xl font-bold text-white">
+          {{ status()?.metrics?.avgResponseTime ?? 0 }}ms
+        </div>
+        <div class="text-xs text-white/60 mt-1">Last 24 hours</div>
+      </div>
+      <div
+        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+      >
+        <div class="text-sm text-white/60 mb-1">Total Requests</div>
+        <div class="text-2xl font-bold text-white">
+          {{ (status()?.metrics?.totalRequests ?? 0) | number }}
+        </div>
+        <div class="text-xs text-white/60 mt-1">Last 7 days</div>
+      </div>
+      <div
+        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+      >
+        <div class="text-sm text-white/60 mb-1">Error Rate</div>
+        <div class="text-2xl font-bold text-white">
+          {{ status()?.metrics?.errorRate ?? 0 }}%
+        </div>
+        <div class="text-xs text-red-400 mt-1">Requires attention</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div
+      class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    >
+      <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
+        <button
+          (click)="setActiveTab('overview')"
+          [class]="
+            activeTab() === 'overview'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
+          "
+        >
+          Overview
+        </button>
+        <button
+          (click)="setActiveTab('endpoints')"
+          [class]="
+            activeTab() === 'endpoints'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
+          "
+        >
+          Endpoints
+        </button>
+        <button
+          (click)="setActiveTab('performance')"
+          [class]="
+            activeTab() === 'performance'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
+          "
+        >
+          Performance
+        </button>
+        <button
+          (click)="setActiveTab('activity')"
+          [class]="
+            activeTab() === 'activity'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
+          "
+        >
+          Activity
+        </button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab() === 'overview'" class="space-y-6">
+        <!-- System Health -->
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">System Health</h3>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <!-- Database -->
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-white">Database</span>
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                  [class]="getStatusColor(status()!.systemHealth.database.status)"
+                >
+                  {{ status()!.systemHealth.database.status }}
+                </span>
+              </div>
+              <div class="text-xs text-white/60">
+                Response Time: {{ status()!.systemHealth.database.responseTime }}ms
+              </div>
+              <div class="text-xs text-white/60">
+                Connected: {{ status()!.systemHealth.database.connected ? 'Yes' : 'No' }}
+              </div>
+            </div>
+
+            <!-- API -->
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-white">API Service</span>
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                  [class]="getStatusColor(status()!.systemHealth.api.status)"
+                >
+                  {{ status()!.systemHealth.api.status }}
+                </span>
+              </div>
+              <div class="text-xs text-white/60">
+                Uptime: {{ status()!.systemHealth.api.uptime }}
+              </div>
+              <div class="text-xs text-white/60">
+                Avg Response: {{ status()!.systemHealth.api.avgResponseTime }}ms
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Statistics -->
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Data Statistics</h3>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="text-sm text-white/60 mb-1">Employees</div>
+              <div class="text-xl font-bold text-white">
+                {{ status()!.systemHealth.data.employees }}
+              </div>
+            </div>
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="text-sm text-white/60 mb-1">Projects</div>
+              <div class="text-xl font-bold text-white">
+                {{ status()!.systemHealth.data.projects }}
+              </div>
+            </div>
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="text-sm text-white/60 mb-1">Assignments</div>
+              <div class="text-xl font-bold text-white">
+                {{ status()!.systemHealth.data.assignments }}
+              </div>
+            </div>
+            <div
+              class="rounded-xl border border-white/10 bg-white/5 p-4"
+            >
+              <div class="text-sm text-white/60 mb-1">Departments</div>
+              <div class="text-xl font-bold text-white">
+                {{ status()!.systemHealth.data.departments }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoints Tab -->
+      <div *ngIf="activeTab() === 'endpoints'" class="space-y-4">
+        <h3 class="text-lg font-semibold text-white mb-4">Endpoint Health by Category</h3>
+        <div
+          *ngFor="let endpoint of status()!.endpointHealth"
+          class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-medium text-white">{{ endpoint.category }}</span>
+              <span
+                class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                [class]="getStatusColor(endpoint.status)"
+              >
+                {{ endpoint.status }}
+              </span>
+            </div>
+            <div class="text-sm text-white/60">
+              {{ endpoint.healthy }}/{{ endpoint.total }} healthy
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-white/60">
+            <span>Avg Response: {{ endpoint.avgResponseTime }}ms</span>
+            <div class="flex-1">
+              <div class="h-1.5 rounded-full bg-white/10">
+                <div
+                  class="h-1.5 rounded-full bg-primary transition-all"
+                  [style.width.%]="(endpoint.healthy / endpoint.total) * 100"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Tab -->
+      <div *ngIf="activeTab() === 'performance'" class="space-y-4">
+        <h3 class="text-lg font-semibold text-white mb-4">Performance History (Last 7 Days)</h3>
+        <div class="space-y-3">
+          <div
+            *ngFor="let day of status()!.performanceHistory"
+            class="rounded-xl border border-white/10 bg-white/5 p-4"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <span class="text-sm font-medium text-white">{{ day.day }}</span>
+                <span class="text-xs text-white/60 ml-2">{{ day.date }}</span>
+              </div>
+              <div class="text-sm text-white/60">
+                {{ day.requests | number }} requests
+              </div>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-3 mt-3">
+              <div>
+                <div class="text-xs text-white/60 mb-1">Avg Response Time</div>
+                <div class="text-sm font-semibold text-white">{{ day.avgResponseTime }}ms</div>
+              </div>
+              <div>
+                <div class="text-xs text-white/60 mb-1">Success Rate</div>
+                <div class="text-sm font-semibold text-green-400">{{ day.successRate.toFixed(1) }}%</div>
+              </div>
+              <div>
+                <div class="text-xs text-white/60 mb-1">Errors</div>
+                <div class="text-sm font-semibold text-red-400">{{ day.errors }}</div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="h-2 rounded-full bg-white/10">
+                <div
+                  class="h-2 rounded-full bg-gradient-to-r from-primary to-green-500 transition-all"
+                  [style.width.%]="day.successRate"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Tab -->
+      <div *ngIf="activeTab() === 'activity'" class="space-y-4">
+        <h3 class="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+        <div class="space-y-2">
+          <div
+            *ngFor="let activity of status()!.recentActivity"
+            class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                  [class]="getMethodColor(activity.method)"
+                >
+                  {{ activity.method }}
+                </span>
+                <span class="text-sm font-medium text-white">{{ activity.endpoint }}</span>
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                  [class]="getStatusBadgeColor(activity.status)"
+                >
+                  {{ activity.status }}
+                </span>
+              </div>
+              <div class="flex items-center gap-4 text-xs text-white/60">
+                <span>{{ activity.responseTime }}ms</span>
+                <span>{{ formatTimeAgo(activity.timestamp) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,697 @@
+<div class="space-y-8 text-white/85">
+  <section
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="w-full sm:max-w-sm">
+      <label for="employee-search" class="sr-only">Search employees</label>
+      <div class="relative">
+        <span
+          class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
+          aria-hidden="true"
+          >🔍</span
+        >
+        <input
+          id="employee-search"
+          type="search"
+          placeholder="البحث"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
+          (input)="updateSearch($any($event.target).value)"
+        />
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div
+        class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/60"
+      >
+        {{ filteredEmployees().length }} : {{ employees().length }} مشتركين
+      </div>
+      <button
+        ubButton
+        size="sm"
+        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        (click)="startCreate()"
+      >
+        اضافة مشترك جديد
+      </button>
+    </div>
+  </section>
+
+  <section
+    *ngIf="showCreatePanel"
+    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+  >
+    <header class="mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-white">اضافة مشترك جديد</h2>
+        <!-- <p class="text-xs uppercase tracking-[0.3em] text-white/50">
+          Quick onboarding form
+        </p> -->
+      </div>
+      <button
+        type="button"
+        [disabled]="isSaving"
+        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="closeCreatePanel()"
+      >
+        الغاء
+      </button>
+    </header>
+    <form
+      [formGroup]="employeeForm"
+      (ngSubmit)="onSave()"
+      class="grid gap-4 sm:grid-cols-2"
+      [class.opacity-50]="isSaving"
+    >
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-name"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >اسم المشترك</label
+        >
+        <input
+            dir="rtl"
+          id="create-name"
+          type="text"
+          formControlName="employeeName"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="الاسم"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+        dir="rtl"
+          for="create-dept"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >العنوان</label
+        >
+        <input
+          id="create-dept"
+          type="text"
+          formControlName="department"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="العنوان"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-deptid"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Department ID</label
+        >
+        <input
+          id="create-deptid"
+          type="number"
+          formControlName="deptId"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="101"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-role"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Role</label
+        >
+        <input
+          id="create-role"
+          type="text"
+          formControlName="role"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Backend Engineer"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-title"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Title</label
+        >
+        <input
+          id="create-title"
+          type="text"
+          formControlName="title"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Principal Engineer"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-employment"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Employment type</label
+        >
+        <input
+          id="create-employment"
+          type="text"
+          formControlName="employmentType"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Full-time"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-phone"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Contact number</label
+        >
+        <input
+          id="create-phone"
+          type="tel"
+          formControlName="contactNo"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="+1 (555) 123-9876"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-email"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Email</label
+        >
+        <input
+          id="create-email"
+          type="email"
+          formControlName="emailId"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="person@example.com"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-location"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Location</label
+        >
+        <input
+          id="create-location"
+          type="text"
+          formControlName="location"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Berlin"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-timezone"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Timezone</label
+        >
+        <input
+          id="create-timezone"
+          type="text"
+          formControlName="timezone"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Europe/Berlin"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-hireDate"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Hire Date</label
+        >
+        <input
+          id="create-hireDate"
+          type="date"
+          formControlName="hireDate"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-skills"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Skills (comma separated)</label
+        >
+        <input
+          id="create-skills"
+          type="text"
+          formControlName="skills"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Angular, TypeScript"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-tags"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Tags (comma separated)</label
+        >
+        <input
+          id="create-tags"
+          type="text"
+          formControlName="tags"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="mentor, remote"
+        />
+      </div>
+      <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+        <button
+          type="submit"
+          ubButton
+          size="sm"
+          [disabled]="isSaving"
+          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isSaving">Save employee</span>
+          <span *ngIf="isSaving">Saving employee...</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="space-y-4">
+    <div
+      *ngFor="let employee of filteredEmployees(); let idx = index"
+      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+    >
+      <button
+        type="button"
+        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        (click)="toggleExpand(employee.employeeId)"
+      >
+        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+          <span
+            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-semibold text-white/80 shadow-inner shadow-slate-950/25"
+          >
+            {{ employee.employeeId }}
+          </span>
+          <span class="font-semibold text-white md:ml-4 md:text-base">
+            {{ employee.employeeName }}
+          </span>
+          <span
+            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+          >
+            {{ employee.department }}
+          </span>
+          <span
+            *ngIf="employee.role"
+            class="mt-1 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+          >
+            {{ employee.role }}
+          </span>
+        </div>
+        <span
+          class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
+          [class.text-white]="expandedEmployeeId === employee.employeeId"
+        >
+          {{ expandedEmployeeId === employee.employeeId ? "Hide" : "Details" }}
+        </span>
+      </button>
+
+      <div
+        *ngIf="expandedEmployeeId === employee.employeeId"
+        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+      >
+        <ng-container
+          *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
+        >
+          <form
+            [formGroup]="employeeForm"
+            class="grid gap-4 md:grid-cols-2"
+            (ngSubmit)="onSave()"
+            [class.opacity-50]="isSaving"
+          >
+            <div class="md:col-span-1">
+              <label
+                for="edit-name-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Employee name</label
+              >
+              <input
+                [id]="'edit-name-' + employee.employeeId"
+                type="text"
+                formControlName="employeeName"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-dept-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Department</label
+              >
+              <input
+                [id]="'edit-dept-' + employee.employeeId"
+                type="text"
+                formControlName="department"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-deptid-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Department ID</label
+              >
+              <input
+                [id]="'edit-deptid-' + employee.employeeId"
+                type="number"
+                formControlName="deptId"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-role-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Role</label
+              >
+              <input
+                [id]="'edit-role-' + employee.employeeId"
+                type="text"
+                formControlName="role"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-title-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Title</label
+              >
+              <input
+                [id]="'edit-title-' + employee.employeeId"
+                type="text"
+                formControlName="title"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-employment-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Employment type</label
+              >
+              <input
+                [id]="'edit-employment-' + employee.employeeId"
+                type="text"
+                formControlName="employmentType"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-phone-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Contact number</label
+              >
+              <input
+                [id]="'edit-phone-' + employee.employeeId"
+                type="tel"
+                formControlName="contactNo"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-email-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Email</label
+              >
+              <input
+                [id]="'edit-email-' + employee.employeeId"
+                type="email"
+                formControlName="emailId"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-location-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Location</label
+              >
+              <input
+                [id]="'edit-location-' + employee.employeeId"
+                type="text"
+                formControlName="location"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-timezone-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Timezone</label
+              >
+              <input
+                [id]="'edit-timezone-' + employee.employeeId"
+                type="text"
+                formControlName="timezone"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-hireDate-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Hire Date</label
+              >
+              <input
+                [id]="'edit-hireDate-' + employee.employeeId"
+                type="date"
+                formControlName="hireDate"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-skills-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Skills</label
+              >
+              <input
+                [id]="'edit-skills-' + employee.employeeId"
+                type="text"
+                formControlName="skills"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <label
+                for="edit-tags-{{ employee.employeeId }}"
+                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                >Tags</label
+              >
+              <input
+                [id]="'edit-tags-' + employee.employeeId"
+                type="text"
+                formControlName="tags"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                [disabled]="isSaving"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                ubButton
+                size="sm"
+                [disabled]="isSaving"
+                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span *ngIf="!isSaving">Save changes</span>
+                <span *ngIf="isSaving">Updating...</span>
+              </button>
+            </div>
+          </form>
+        </ng-container>
+        <ng-template #viewMode>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Employee ID
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.employeeId }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Department
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.department }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Department ID
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.deptId || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Role & Title
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.role || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.title || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Employment type
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.employmentType || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Contact
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.contactNo || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.emailId || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Location
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.location || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.timezone || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Hire Date
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  employee.hireDate
+                    ? (employee.hireDate | date: 'mediumDate')
+                    : (employee.createdAt
+                        ? (employee.createdAt | date: 'mediumDate')
+                        : '—')
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Skills
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  employee.skills && employee.skills.length
+                    ? employee.skills.join(', ')
+                    : '—'
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Tags
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  employee.tags && employee.tags.length
+                    ? employee.tags.join(', ')
+                    : '—'
+                }}
+              </p>
+            </div>
+            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="onEdit(employee)"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                (click)="promptDelete(employee)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!filteredEmployees().length"
+      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+    >
+      No employees match your filters.
+  </div>
+  </section>
+        </div>
+
+<div
+  *ngIf="pendingDelete as toDelete"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
+  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+>
+  <div
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+  >
+    <h2 class="text-lg font-semibold text-white">
+      Delete {{ toDelete.employeeName }}?
+    </h2>
+    <p class="mt-2 text-white/70">
+      This action cannot be undone. The employee record will be permanently
+      removed from the system.
+    </p>
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(false)"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(true)"
+      >
+        <span *ngIf="!isDeleting">Delete employee</span>
+        <span *ngIf="isDeleting">Deleting...</span>
+      </button>
+    </div>
+  </div>
+</div>
