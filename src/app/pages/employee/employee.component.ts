@@ -6,10 +6,18 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MasterService } from '../../service/master.service';
+import { MemberService } from '../../service/memberService';
 import { Employee } from '../../model/class/Employee';
+import { Member, MemberType } from '../../model/class/Member';
 import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
+
+export enum SubscriptionType {
+  Vip = 'vip',
+  Regular = 'regular',
+  Staff = 'staff',
+}
 
 @Component({
   selector: 'app-employee',
@@ -19,9 +27,14 @@ import { ToastService } from '@/app/components/ui/toast.service';
   styleUrls: ['./employee.component.css'],
 })
 export class EmployeeComponent implements OnInit {
-  employeeForm: FormGroup;
+  // employeeForm: FormGroup;
+  memberForm: FormGroup;
+
+
   private readonly employeesSignal = signal<Employee[]>([]);
   readonly employees = this.employeesSignal.asReadonly();
+  readonly subscriptionTypes = Object.values(SubscriptionType) as SubscriptionType[];
+
   readonly filteredEmployees = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
@@ -46,23 +59,19 @@ export class EmployeeComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private masterService: MasterService,
+    private memberService: MemberService,
     private toast: ToastService
   ) {
-    this.employeeForm = this.fb.group({
-      employeeId: [null], // Add employeeId to the form
-      employeeName: ['', Validators.required],
-      department: ['', Validators.required],
-      deptId: [null],
-      role: [''],
-      title: [''],
-      employmentType: [''],
-      contactNo: [''],
-      emailId: ['', Validators.email],
-      location: [''],
-      timezone: [''],
-      hireDate: [''],
-      skills: [''],
-      tags: [''],
+    this.memberForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', Validators.email],
+      phoneNumber: ['', Validators.required],
+      address: [''],
+      membershipType: [''],
+      code: [''],
+      nationalId: [''],
+      birthDate: [''],
+      
     });
   }
 
@@ -93,7 +102,7 @@ export class EmployeeComponent implements OnInit {
     this.showCreatePanel = true;
     this.editingEmployeeId = null;
     this.expandedEmployeeId = null;
-    this.employeeForm.reset({
+    this.memberForm.reset({
       employeeId: null,
       employeeName: '',
       department: '',
@@ -132,7 +141,7 @@ export class EmployeeComponent implements OnInit {
       }
     };
 
-    this.employeeForm.patchValue({
+    this.memberForm.patchValue({
       employeeId: employee.employeeId ?? null,
       employeeName: employee.employeeName ?? '',
       department: employee.department ?? '',
@@ -153,7 +162,7 @@ export class EmployeeComponent implements OnInit {
   cancelEdit() {
     this.isSaving = false;
     this.editingEmployeeId = null;
-    this.employeeForm.reset({
+    this.memberForm.reset({
       employeeId: null,
       employeeName: '',
       department: '',
@@ -207,55 +216,55 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
-  onSave() {
-    if (this.employeeForm.valid && !this.isSaving) {
-      const employee = this.normalizePayload(this.employeeForm.value);
-      this.isSaving = true;
-      if (employee.employeeId) {
-        // Update existing employee
-        this.masterService.updateEmp(employee).subscribe(
-          () => {
-            this.isSaving = false;
-            this.getEmployees();
-            this.employeeForm.reset();
-            this.toast.success({
-              title: 'Employee updated',
-              description: 'Employee details were saved successfully.',
-            });
-            this.editingEmployeeId = null;
-          },
-          () => {
-            this.isSaving = false;
-            this.toast.error({
-              title: 'Update failed',
-              description: 'Something went wrong while saving changes.',
-            });
-          }
-        );
-      } else {
-        // Create new employee
-        this.masterService.saveEmp(employee).subscribe(
-          () => {
-            this.isSaving = false;
-            this.getEmployees();
-            this.employeeForm.reset();
-            this.toast.success({
-              title: 'Employee created',
-              description: 'A new employee record is now available.',
-            });
-            this.showCreatePanel = false;
-          },
-          () => {
-            this.isSaving = false;
-            this.toast.error({
-              title: 'Creation failed',
-              description: 'Unable to save the new employee.',
-            });
-          }
-        );
-      }
-    }
-  }
+  // onSave() {
+  //   if (this.memberForm.valid && !this.isSaving) {
+  //     const employee = this.normalizePayload(this.memberForm.value);
+  //     this.isSaving = true;
+  //     if (employee.employeeId) {
+  //       // Update existing employee
+  //       this.masterService.updateEmp(employee).subscribe(
+  //         () => {
+  //           this.isSaving = false;
+  //           this.getEmployees();
+  //           this.memberForm.reset();
+  //           this.toast.success({
+  //             title: 'Employee updated',
+  //             description: 'Employee details were saved successfully.',
+  //           });
+  //           this.editingEmployeeId = null;
+  //         },
+  //         () => {
+  //           this.isSaving = false;
+  //           this.toast.error({
+  //             title: 'Update failed',
+  //             description: 'Something went wrong while saving changes.',
+  //           });
+  //         }
+  //       );
+  //     } else {
+  //       // Create new employee
+  //       this.masterService.saveEmp(employee).subscribe(
+  //         () => {
+  //           this.isSaving = false;
+  //           this.getEmployees();
+  //           this.memberForm.reset();
+  //           this.toast.success({
+  //             title: 'Employee created',
+  //             description: 'A new employee record is now available.',
+  //           });
+  //           this.showCreatePanel = false;
+  //         },
+  //         () => {
+  //           this.isSaving = false;
+  //           this.toast.error({
+  //             title: 'Creation failed',
+  //             description: 'Unable to save the new employee.',
+  //           });
+  //         }
+  //       );
+  //     }
+  //   }
+  // }
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
@@ -305,5 +314,43 @@ export class EmployeeComponent implements OnInit {
       skills: parseCsv(raw.skills),
       tags: parseCsv(raw.tags),
     } as Employee;
+  }
+
+  saveMember() {
+    if (this.memberForm.valid && !this.isSaving) {
+      const member = this.buildMemberPayload();
+      this.isSaving = true;
+
+      this.memberService.createMember(member).subscribe(
+        () => {
+          this.isSaving = false;
+          this.toast.success({
+            title: 'Member created',
+            description: 'The new member has been saved successfully.',
+          });
+          this.memberForm.reset();
+          this.showCreatePanel = false;
+        },
+        () => {
+          this.isSaving = false;
+          this.toast.error({
+            title: 'Save failed',
+            description: 'Unable to save the member at this time.',
+          });
+        }
+      );
+    }
+  }
+
+  private buildMemberPayload(): Member {
+    const formValue = this.memberForm.value;
+    return new Member({
+      fullName: formValue.fullName ?? '',
+      email: formValue.email ?? '',
+      phone: formValue.phoneNumber ?? '',
+      memberType:
+        (formValue.membershipType as MemberType) ?? MemberType.Regular,
+      address: formValue.address ?? '',
+    });
   }
 }

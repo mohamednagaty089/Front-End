@@ -40,141 +40,159 @@
     *ngIf="showCreatePanel"
     class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
-    <header class="mb-4 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-semibold text-white">اضافة مشترك جديد</h2>
+    <header class="mb-6 text-center">
+      <div class="text-center w-full">
+        <h2 class="text-lg font-semibold text-white mx-auto">اضافة مشترك جديد</h2>
         <!-- <p class="text-xs uppercase tracking-[0.3em] text-white/50">
           Quick onboarding form
         </p> -->
       </div>
-      <button
-        type="button"
-        [disabled]="isSaving"
-        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="closeCreatePanel()"
-      >
-        الغاء
-      </button>
     </header>
     <form
-      [formGroup]="employeeForm"
-      (ngSubmit)="onSave()"
+      [formGroup]="memberForm"
+      (ngSubmit)="saveMember()"
       class="grid gap-4 sm:grid-cols-2"
       [class.opacity-50]="isSaving"
     >
+     
       <div class="sm:col-span-1">
         <label
           dir="rtl"
+          for="create-dept"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >العنوان</label
+        >
+        <input
+          dir="rtl"
+          id="create-dept"
+          type="text"
+          formControlName="address"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+       <div class="sm:col-span-1">
+        <label
           for="create-name"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >اسم المشترك</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >اسم المشترك <span class="text-rose-400">*</span></label
         >
               <!-- placeholder="الاسم" -->
         <input
             dir="rtl"
           id="create-name"
           type="text"
-          formControlName="employeeName"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-    
-        />
-      </div>
-      <div class="sm:col-span-1">
-        <label
-        dir="rtl"
-          for="create-dept"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >العنوان</label
-        >
-                  <!-- placeholder="العنوان" -->
-        <input
-          id="create-dept"
-          type="text"
-          formControlName="department"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          formControlName="fullName"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div class="sm:col-span-1">
         <label
           for="create-deptid"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >رقم الهاتف</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >رقم الهاتف <span class="text-rose-400">*</span></label
         >
         <input
+          dir="rtl"
           id="create-deptid"
           type="number"
           formControlName="phoneNumber"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-          
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div class="sm:col-span-1">
         <label
           for="create-role"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
           >البريد الاكتروني</label
         >
         <input
+          dir="rtl"
           id="create-role"
           type="text"
-          formControlName="role"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-          placeholder="Backend Engineer"
+          formControlName="email"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+
+   <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-hireDate"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >تاريخ الميلاد</label
+        >
+        <input
+          dir="rtl"
+          id="create-hireDate"
+          type="date"
+          formControlName="birthDate"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div class="sm:col-span-1">
         <label
+          dir="rtl"
           for="create-title"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Title</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الرقم القومي</label
         >
         <input
+          dir="rtl"
           id="create-title"
           type="text"
-          formControlName="title"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-          placeholder="Principal Engineer"
+          formControlName="nationalId"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div class="sm:col-span-1">
         <label
+          dir="rtl"
           for="create-employment"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Employment type</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الكود</label
         >
         <input
+          dir="rtl"
           id="create-employment"
           type="text"
-          formControlName="employmentType"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-          placeholder="Full-time"
+          formControlName="code"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div class="sm:col-span-1">
         <label
+          dir="rtl"
           for="create-phone"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Contact number</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >نوع الاشتراك</label
         >
-        <input
+        <select
+          dir="rtl"
           id="create-phone"
-          type="tel"
-          formControlName="contactNo"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-          placeholder="+1 (555) 123-9876"
-        />
+          formControlName="membershipType"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        >
+          <option value="" disabled hidden>اختر نوع الاشتراك</option>
+          <option *ngFor="let type of subscriptionTypes" [value]="type">
+            {{ type }}
+          </option>
+        </select>
       </div>
-      <div class="sm:col-span-1">
+      <!-- <div class="sm:col-span-1">
         <label
           for="create-email"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Email</label
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >Email <span class="text-rose-400">*</span></label
         >
         <input
+          dir="rtl"
           id="create-email"
           type="email"
           formControlName="emailId"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
           placeholder="person@example.com"
         />
       </div>
@@ -206,19 +224,7 @@
           placeholder="Europe/Berlin"
         />
       </div>
-      <div class="sm:col-span-1">
-        <label
-          for="create-hireDate"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Hire Date</label
-        >
-        <input
-          id="create-hireDate"
-          type="date"
-          formControlName="hireDate"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-        />
-      </div>
+   
       <div class="sm:col-span-1">
         <label
           for="create-skills"
@@ -246,8 +252,16 @@
           class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
           placeholder="mentor, remote"
         />
-      </div>
-      <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+      </div> -->
+      <div dir="ltr" class="sm:col-span-2 flex items-center justify-start gap-2 pt-2">
+        <button
+          type="button"
+          [disabled]="isSaving"
+          class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="closeCreatePanel()"
+        >
+          الغاء
+        </button>
         <button
           type="submit"
           ubButton
@@ -255,8 +269,8 @@
           [disabled]="isSaving"
           class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span *ngIf="!isSaving">Save employee</span>
-          <span *ngIf="isSaving">Saving employee...</span>
+          <span *ngIf="!isSaving">حفظ</span>
+          <span *ngIf="isSaving">تم الحفظ بنجاح...</span>
         </button>
       </div>
     </form>
@@ -309,9 +323,9 @@
           *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
         >
           <form
-            [formGroup]="employeeForm"
+            [formGroup]="memberForm"
             class="grid gap-4 md:grid-cols-2"
-            (ngSubmit)="onSave()"
+            (ngSubmit)="saveMember()"
             [class.opacity-50]="isSaving"
           >
             <div class="md:col-span-1">
@@ -396,14 +410,18 @@
               <label
                 for="edit-phone-{{ employee.employeeId }}"
                 class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
-                >Contact number</label
+                >نوع الاشتراك</label
               >
-              <input
+              <select
                 [id]="'edit-phone-' + employee.employeeId"
-                type="tel"
                 formControlName="contactNo"
                 class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-              />
+              >
+                <option value="" disabled hidden>اختر نوع الاشتراك</option>
+                <option *ngFor="let type of subscriptionTypes" [value]="type">
+                  {{ type }}
+                </option>
+              </select>
             </div>
             <div class="md:col-span-1">
               <label

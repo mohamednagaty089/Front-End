@@ -14,13 +14,13 @@ const fromEnv = (key: string, fallback: string) => {
 
 export const environment = {
   production: false,
-  appBaseUrl: fromEnv('APP_BASE_URL', 'http://localhost:4200'),
+  appBaseUrl: fromEnv('APP_BASE_URL', 'http://localhost:8090'),
   demoLogin: {
     username: 'admin',
     password: '112233',
   },
   api: {
-    baseUrl: fromEnv('NG_APP_API_BASE_URL', '/api/employee-management/'),
+    baseUrl: fromEnv('NG_APP_API_BASE_URL', 'http://localhost:8090/api'),
     aiAssistantUrl: fromEnv('NG_APP_AI_ASSISTANT_URL', ''),
     contentfulProxyUrl: fromEnv('NG_APP_CONTENTFUL_PROXY_URL', ''),
   },
