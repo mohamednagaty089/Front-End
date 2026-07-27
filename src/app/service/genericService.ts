@@ -42,6 +42,16 @@ export class GenericService<T> {
       );
   }
 
+ // ✅ Generic GET method - T is the data type
+     get<T>(endpoint: string): Observable<ApiResponse<T>> {
+        return this.http.get<ApiResponse<T>>(this.getUrl(endpoint))
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            );
+    }
+  
+
   // GET by ID
   getById(endpoint: string, id: number | string): Observable<ApiResponse<T>> {
     return this.http.get<ApiResponse<T>>(`${this.getUrl(endpoint)}/${id}`)

@@ -23,7 +23,7 @@
       <div
         class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/60"
       >
-        {{ filteredEmployees().length }} : {{ employees().length }} مشتركين
+        {{ filteredMembers().length }} : {{ members().length }} مشتركين
       </div>
       <button
         ubButton
@@ -278,51 +278,50 @@
 
   <section class="space-y-4">
     <div
-      *ngFor="let employee of filteredEmployees(); let idx = index"
+      *ngFor="let member of filteredMembers(); let idx = index"
       class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
         class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleExpand(employee.employeeId)"
+        (click)="toggleExpand(member.id)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
           <span
             class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-semibold text-white/80 shadow-inner shadow-slate-950/25"
           >
-            {{ employee.employeeId }}
+            {{ idx + 1 }}
           </span>
           <span class="font-semibold text-white md:ml-4 md:text-base">
-            {{ employee.employeeName }}
+            {{ member.fullName }}
           </span>
           <span
             class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
           >
-            {{ employee.department }}
+            {{ member.phone }}
           </span>
           <span
-            *ngIf="employee.role"
             class="mt-1 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
           >
-            {{ employee.role }}
+            {{ member.address }}
           </span>
         </div>
         <span
           class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
-          [class.text-white]="expandedEmployeeId === employee.employeeId"
+          [class.text-white]="expandedEmployeeId === member.id"
         >
-          {{ expandedEmployeeId === employee.employeeId ? "Hide" : "Details" }}
+          {{ expandedEmployeeId === member.id ? "Hide" : "Details" }}
         </span>
       </button>
 
       <div
-        *ngIf="expandedEmployeeId === employee.employeeId"
+        *ngIf="expandedEmployeeId === member.id"
         class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
       >
         <ng-container
-          *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
+          *ngIf="editingEmployeeId === member.id; else viewMode"
         >
-          <form
+          <!-- <form
             [formGroup]="memberForm"
             class="grid gap-4 md:grid-cols-2"
             (ngSubmit)="saveMember()"
@@ -330,12 +329,12 @@
           >
             <div class="md:col-span-1">
               <label
-                for="edit-name-{{ employee.employeeId }}"
+                for="edit-name-{{ member.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
-                >Employee name</label
+                >f</label
               >
               <input
-                [id]="'edit-name-' + employee.employeeId"
+                [id]="'edit-name-' + member.id"
                 type="text"
                 formControlName="employeeName"
                 class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
@@ -343,7 +342,7 @@
             </div>
             <div class="md:col-span-1">
               <label
-                for="edit-dept-{{ employee.employeeId }}"
+                for="edit-dept-{{ member.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
                 >Department</label
               >
@@ -521,7 +520,7 @@
                 <span *ngIf="isSaving">Updating...</span>
               </button>
             </div>
-          </form>
+          </form> -->
         </ng-container>
         <ng-template #viewMode>
           <div class="grid gap-4 sm:grid-cols-2">
@@ -529,33 +528,33 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Employee ID
+                رقم المشترك
               </p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.employeeId }}
+                {{ member.id }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Department
+                الاسم
               </p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.department }}
+                {{ member.fullName || '—' }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Department ID
+                العنوان
               </p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.deptId || '—' }}
+                {{member.address || '—' }}
               </p>
             </div>
-            <div
+            <!-- <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
@@ -567,18 +566,18 @@
               <p class="text-xs text-white/55">
                 {{ employee.title || '—' }}
               </p>
-            </div>
+            </div> -->
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Employment type
+                البريد الاكتروني
               </p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.employmentType || '—' }}
+                {{ member.email || '—' }}
               </p>
             </div>
-            <div
+            <!-- <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
@@ -642,24 +641,24 @@
               </p>
               <p class="mt-1 text-base font-semibold text-white">
                 {{
-                  employee.tags && employee.tags.length
-                    ? employee.tags.join(', ')
+                  member.tags && member.tags.length
+                    ? member.tags.join(', ')
                     : '—'
                 }}
               </p>
-            </div>
+            </div> -->
             <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="onEdit(employee)"
+                (click)="onEdit(member)"
               >
                 Edit
               </button>
               <button
                 type="button"
                 class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
-                (click)="promptDelete(employee)"
+                (click)="promptDelete(member)"
               >
                 Delete
               </button>
@@ -670,7 +669,7 @@
     </div>
 
     <div
-      *ngIf="!filteredEmployees().length"
+      *ngIf="!filteredMembers().length"
       class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
       No employees match your filters.
@@ -687,7 +686,7 @@
     class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
   >
     <h2 class="text-lg font-semibold text-white">
-      Delete {{ toDelete.employeeName }}?
+      Delete {{ toDelete.fullName }}?
     </h2>
     <p class="mt-2 text-white/70">
       This action cannot be undone. The employee record will be permanently

@@ -12,6 +12,7 @@ import { Member, MemberType } from '../../model/class/Member';
 import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
+import { ApiResponse } from '@/app/service/genericService';
 
 export enum SubscriptionType {
   Vip = 'vip',
@@ -31,20 +32,20 @@ export class EmployeeComponent implements OnInit {
   memberForm: FormGroup;
 
 
-  private readonly employeesSignal = signal<Employee[]>([]);
-  readonly employees = this.employeesSignal.asReadonly();
+  private readonly membersSignal = signal<Member[]>([]);
+  readonly members = this.membersSignal.asReadonly();
   readonly subscriptionTypes = Object.values(SubscriptionType) as SubscriptionType[];
 
-  readonly filteredEmployees = computed(() => {
+  readonly filteredMembers = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
-      return this.employees();
+      return this.members();
     }
-    return this.employees().filter(
+    return this.members().filter(
       (employee) =>
-        employee.employeeName?.toLowerCase().includes(term) ||
-        employee.department?.toLowerCase().includes(term) ||
-        employee.employeeId?.toString().includes(term)
+        employee.fullName?.toLowerCase().includes(term) ||
+        employee.phone?.toLowerCase().includes(term) ||
+        employee.email?.toString().includes(term)
     );
   });
 
@@ -52,7 +53,7 @@ export class EmployeeComponent implements OnInit {
   expandedEmployeeId: number | null = null;
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
-  pendingDelete: Employee | null = null;
+  pendingDelete: Member | null = null;
   isSaving = false;
   isDeleting = false;
 
@@ -76,14 +77,15 @@ export class EmployeeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getEmployees();
+    this.getMembers();
   }
 
-  getEmployees() {
-    this.masterService.getAllEmp().subscribe((res: Employee[]) => {
-      this.employeesSignal.set(res ?? []);
-      if (!this.expandedEmployeeId && res?.length) {
-        this.expandedEmployeeId = res[0].employeeId ?? null;
+  getMembers() {
+    this.memberService.getTopTenMembers().subscribe((res: ApiResponse<Member[]>) => {
+      const members = res?.data ?? [];
+      this.membersSignal.set(members);
+      if (!this.expandedEmployeeId && members.length) {
+        this.expandedEmployeeId = members[0].id ?? null;
       }
     });
   }
@@ -125,38 +127,38 @@ export class EmployeeComponent implements OnInit {
     this.showCreatePanel = false;
   }
 
-  onEdit(employee: Employee) {
+  onEdit(member: Member) {
     this.showCreatePanel = false;
-    this.editingEmployeeId = employee.employeeId ?? null;
-    this.expandedEmployeeId = employee.employeeId ?? null;
-    // Format hireDate for date input (YYYY-MM-DD)
-    const formatDateForInput = (dateStr: string | null | undefined): string => {
-      if (!dateStr) return '';
-      try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return '';
-        return date.toISOString().split('T')[0];
-      } catch {
-        return '';
-      }
-    };
+    // this.editingEmployeeId = employee.employeeId ?? null;
+    // this.expandedEmployeeId = employee.employeeId ?? null;
+    // // Format hireDate for date input (YYYY-MM-DD)
+    // const formatDateForInput = (dateStr: string | null | undefined): string => {
+    //   if (!dateStr) return '';
+    //   try {
+    //     const date = new Date(dateStr);
+    //     if (isNaN(date.getTime())) return '';
+    //     return date.toISOString().split('T')[0];
+    //   } catch {
+    //     return '';
+    //   }
+    // };
 
-    this.memberForm.patchValue({
-      employeeId: employee.employeeId ?? null,
-      employeeName: employee.employeeName ?? '',
-      department: employee.department ?? '',
-      deptId: employee.deptId ?? null,
-      role: employee.role ?? '',
-      title: employee.title ?? '',
-      employmentType: employee.employmentType ?? '',
-      contactNo: employee.contactNo ?? '',
-      emailId: employee.emailId ?? '',
-      location: employee.location ?? '',
-      timezone: employee.timezone ?? '',
-      hireDate: formatDateForInput(employee.hireDate),
-      skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
-      tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
-    });
+    // this.memberForm.patchValue({
+    //   employeeId: employee.employeeId ?? null,
+    //   employeeName: employee.employeeName ?? '',
+    //   department: employee.department ?? '',
+    //   deptId: employee.deptId ?? null,
+    //   role: employee.role ?? '',
+    //   title: employee.title ?? '',
+    //   employmentType: employee.employmentType ?? '',
+    //   contactNo: employee.contactNo ?? '',
+    //   emailId: employee.emailId ?? '',
+    //   location: employee.location ?? '',
+    //   timezone: employee.timezone ?? '',
+    //   hireDate: formatDateForInput(employee.hireDate),
+    //   skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
+    //   tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
+    // });
   }
 
   cancelEdit() {
@@ -180,40 +182,40 @@ export class EmployeeComponent implements OnInit {
     });
   }
 
-  promptDelete(employee: Employee) {
-    this.pendingDelete = employee;
+  promptDelete(member: Member) {
+    this.pendingDelete = member;
   }
 
   confirmDelete(confirmed: boolean) {
-    if (!confirmed || !this.pendingDelete?.employeeId) {
+    if (!confirmed || !this.pendingDelete?.id) {
       this.pendingDelete = null;
       return;
     }
-    const { employeeId, employeeName } = this.pendingDelete;
-    this.isDeleting = true;
-    this.masterService.deleteEmpById(employeeId).subscribe(
-      () => {
-        this.isDeleting = false;
-        this.pendingDelete = null;
-        this.employeesSignal.update((list) =>
-          list.filter((emp) => emp.employeeId !== employeeId)
-        );
-        this.toast.success({
-          title: 'Employee removed',
-          description: `${employeeName} has been deleted.`,
-        });
-        if (this.expandedEmployeeId === employeeId) {
-          this.expandedEmployeeId = null;
-        }
-      },
-      () => {
-        this.isDeleting = false;
-        this.toast.error({
-          title: 'Deletion failed',
-          description: 'Unable to delete the employee right now.',
-        });
-      }
-    );
+    // const { employeeId, employeeName } = this.pendingDelete;
+    // this.isDeleting = true;
+    // this.masterService.deleteEmpById(employeeId).subscribe(
+    //   () => {
+    //     this.isDeleting = false;
+    //     this.pendingDelete = null;
+    //     this.employeesSignal.update((list) =>
+    //       list.filter((emp) => emp.employeeId !== employeeId)
+    //     );
+    //     this.toast.success({
+    //       title: 'Employee removed',
+    //       description: `${employeeName} has been deleted.`,
+    //     });
+    //     if (this.expandedEmployeeId === employeeId) {
+    //       this.expandedEmployeeId = null;
+    //     }
+    //   },
+    //   () => {
+    //     this.isDeleting = false;
+    //     this.toast.error({
+    //       title: 'Deletion failed',
+    //       description: 'Unable to delete the employee right now.',
+    //     });
+    //   }
+    // );
   }
 
   // onSave() {

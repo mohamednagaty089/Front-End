@@ -32,6 +32,12 @@ export class MemberService extends GenericService<Member> {
     return this.create(endpoint, member);
   }
 
+  // Get top ten members
+  getTopTenMembers(): Observable<ApiResponse<Member[]>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.MEMBERS_GET_TO_TEN}`;
+    return this.get<Member[]>(endpoint);
+  }
+
   // Update member
 //   updateMember(id: number, member: Member): Observable<Member> {
 //     return this.update<Member>(this.MEMBERS_ENDPOINT, id, member);
@@ -57,10 +63,8 @@ export class MemberService extends GenericService<Member> {
 //     return this.getPaginated<Member>(this.MEMBERS_ENDPOINT, page, limit, filters);
 //   }
 
-//   // Get member statistics
-//   getMemberStats(): Observable<any> {
-//     return this.getStats(this.MEMBERS_STATS);
-//   }
+
+
 
 //   // Get members expiring soon
 //   getExpiringMembers(days: number = 30): Observable<Member[]> {
