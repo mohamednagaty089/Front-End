@@ -39,9 +39,10 @@ export class MemberService extends GenericService<Member> {
   }
 
   // Update member
-//   updateMember(id: number, member: Member): Observable<Member> {
-//     return this.update<Member>(this.MEMBERS_ENDPOINT, id, member);
-//   }
+  updateMember(id: number, member: Member): Observable<ApiResponse<Member>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.MEMBERS_UPDATE}`;
+    return this.update(endpoint, id, member);
+  }
 
 //   // Delete member
 //   deleteMember(id: number): Observable<void> {

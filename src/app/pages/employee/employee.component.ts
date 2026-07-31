@@ -129,58 +129,59 @@ export class EmployeeComponent implements OnInit {
 
   onEdit(member: Member) {
     this.showCreatePanel = false;
-    // this.editingEmployeeId = employee.employeeId ?? null;
-    // this.expandedEmployeeId = employee.employeeId ?? null;
-    // // Format hireDate for date input (YYYY-MM-DD)
-    // const formatDateForInput = (dateStr: string | null | undefined): string => {
-    //   if (!dateStr) return '';
-    //   try {
-    //     const date = new Date(dateStr);
-    //     if (isNaN(date.getTime())) return '';
-    //     return date.toISOString().split('T')[0];
-    //   } catch {
-    //     return '';
-    //   }
-    // };
+    this.editingEmployeeId = member.id ?? null;
+    this.expandedEmployeeId = member.id ?? null;
+    // Format hireDate for date input (YYYY-MM-DD)
+    const formatDateForInput = (dateStr: string | null | undefined): string => {
+      if (!dateStr) return '';
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return '';
+        return date.toISOString().split('T')[0];
+      } catch {
+        return '';
+      }
+    };
 
-    // this.memberForm.patchValue({
-    //   employeeId: employee.employeeId ?? null,
-    //   employeeName: employee.employeeName ?? '',
-    //   department: employee.department ?? '',
-    //   deptId: employee.deptId ?? null,
-    //   role: employee.role ?? '',
-    //   title: employee.title ?? '',
-    //   employmentType: employee.employmentType ?? '',
-    //   contactNo: employee.contactNo ?? '',
-    //   emailId: employee.emailId ?? '',
-    //   location: employee.location ?? '',
-    //   timezone: employee.timezone ?? '',
-    //   hireDate: formatDateForInput(employee.hireDate),
-    //   skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
-    //   tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
-    // });
+    this.memberForm.patchValue({
+      id: member.id ?? null,
+      fullName: member.fullName ?? '',
+      email: member.email ?? '',
+      phoneNumber: member.phone ?? null,
+      membershipType: member.memberType ?? '',
+      nationalId: member.nationalId ?? '',
+      // employmentType: member.employmentType ?? '',
+      // contactNo: member.contactNo ?? '',
+      // emailId: member.emailId ?? '',
+      // location: member.location ?? '',
+      // timezone: employee.timezone ?? '',
+      birthDate: formatDateForInput(member.birthDate?.toString()),
+      // skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
+      // tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
+    });
   }
 
   cancelEdit() {
     this.isSaving = false;
     this.editingEmployeeId = null;
     this.memberForm.reset({
-      employeeId: null,
-      employeeName: '',
-      department: '',
-      deptId: null,
-      role: '',
-      title: '',
-      employmentType: '',
-      contactNo: '',
-      emailId: '',
-      location: '',
-      timezone: '',
-      hireDate: '',
-      skills: '',
-      tags: '',
+      id: null,
+      fullName: '',
+      email: '',
+      phoneNumber: null,
+      membershipType: '',
+      nationalId: '',
+      // employmentType: member.employmentType ?? '',
+      // contactNo: member.contactNo ?? '',
+      // emailId: member.emailId ?? '',
+      // location: member.location ?? '',
+      // timezone: employee.timezone ?? '',
+      birthDate: '',
+      // skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
+      // tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
     });
   }
+  
 
   promptDelete(member: Member) {
     this.pendingDelete = member;
@@ -218,55 +219,56 @@ export class EmployeeComponent implements OnInit {
     // );
   }
 
-  // onSave() {
-  //   if (this.memberForm.valid && !this.isSaving) {
-  //     const employee = this.normalizePayload(this.memberForm.value);
-  //     this.isSaving = true;
-  //     if (employee.employeeId) {
-  //       // Update existing employee
-  //       this.masterService.updateEmp(employee).subscribe(
-  //         () => {
-  //           this.isSaving = false;
-  //           this.getEmployees();
-  //           this.memberForm.reset();
-  //           this.toast.success({
-  //             title: 'Employee updated',
-  //             description: 'Employee details were saved successfully.',
-  //           });
-  //           this.editingEmployeeId = null;
-  //         },
-  //         () => {
-  //           this.isSaving = false;
-  //           this.toast.error({
-  //             title: 'Update failed',
-  //             description: 'Something went wrong while saving changes.',
-  //           });
-  //         }
-  //       );
-  //     } else {
-  //       // Create new employee
-  //       this.masterService.saveEmp(employee).subscribe(
-  //         () => {
-  //           this.isSaving = false;
-  //           this.getEmployees();
-  //           this.memberForm.reset();
-  //           this.toast.success({
-  //             title: 'Employee created',
-  //             description: 'A new employee record is now available.',
-  //           });
-  //           this.showCreatePanel = false;
-  //         },
-  //         () => {
-  //           this.isSaving = false;
-  //           this.toast.error({
-  //             title: 'Creation failed',
-  //             description: 'Unable to save the new employee.',
-  //           });
-  //         }
-  //       );
-  //     }
-  //   }
-  // }
+  updateMember(id:number) {
+    if (this.memberForm.valid && !this.isSaving) {
+      const member = this.buildMemberPayload();
+      this.isSaving = true;
+      if (id) {
+        // Update existing employee
+        this.memberService.updateMember(id,member).subscribe(
+          () => {
+            this.isSaving = false;
+            this.getMembers();
+            this.memberForm.reset();
+            this.toast.success({
+              title: 'تم التحديث',
+              message: 'تم حفظ بيانات العضو بنجاح.',
+            });
+            this.editingEmployeeId = null;
+          },
+          () => {
+            this.isSaving = false;
+            this.toast.error({
+              title: 'فشل التحديث',
+              message: 'حدثت مشكلة أثناء حفظ التغييرات.',
+            });
+          }
+        );
+      } 
+      // else {
+      //   // Create new employee
+      //   this.masterService.saveEmp(employee).subscribe(
+      //     () => {
+      //       this.isSaving = false;
+      //       this.getEmployees();
+      //       this.memberForm.reset();
+      //       this.toast.success({
+      //         title: 'Employee created',
+      //         description: 'A new employee record is now available.',
+      //       });
+      //       this.showCreatePanel = false;
+      //     },
+      //     () => {
+      //       this.isSaving = false;
+      //       this.toast.error({
+      //         title: 'Creation failed',
+      //         description: 'Unable to save the new employee.',
+      //       });
+      //     }
+      //   );
+      // }
+    }
+  }
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
@@ -321,14 +323,17 @@ export class EmployeeComponent implements OnInit {
   saveMember() {
     if (this.memberForm.valid && !this.isSaving) {
       const member = this.buildMemberPayload();
+      const barcodeId = `eeeee-33${member.memberType}`;
+      member.barcodeId = barcodeId;
       this.isSaving = true;
 
       this.memberService.createMember(member).subscribe(
-        () => {
+        (res) => {
           this.isSaving = false;
+          const successBarcode = res?.data?.barcodeId ?? barcodeId;
           this.toast.success({
-            title: 'Member created',
-            description: 'The new member has been saved successfully.',
+            title: 'تم الحفظ',
+            message: `تم إنشاء العضو الجديد بنجاح. الرمز: ${successBarcode}`,
           });
           this.memberForm.reset();
           this.showCreatePanel = false;
@@ -336,8 +341,8 @@ export class EmployeeComponent implements OnInit {
         () => {
           this.isSaving = false;
           this.toast.error({
-            title: 'Save failed',
-            description: 'Unable to save the member at this time.',
+            title: 'فشل الحفظ',
+            message: 'تعذر حفظ العضو في الوقت الحالي.',
           });
         }
       );

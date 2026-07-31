@@ -9,21 +9,22 @@ import { ToastService } from './toast.service';
   imports: [CommonModule],
   template: `
     <div
-      class="fixed bottom-4 right-4 z-[9999] flex w-full max-w-sm flex-col gap-3"
+      class="fixed top-4 right-4 z-[9999] flex w-full max-w-sm flex-col gap-3"
       role="status"
       aria-live="polite"
+      dir="rtl"
     >
       <div
         *ngFor="let toast of toasts()"
-        class="rounded-2xl border border-white/10 bg-slate-900/85 p-4 text-sm text-white shadow-lg shadow-slate-950/45 backdrop-blur"
+        class="rounded-2xl border border-white/10 bg-slate-900/85 p-4 text-sm text-white shadow-lg shadow-slate-950/45 backdrop-blur text-right"
         [class]="statusClass(toast.status)"
         [@toastTransition]
       >
         <div class="flex items-start justify-between gap-3">
           <div>
             <p class="font-semibold leading-none">{{ toast.title }}</p>
-            <p *ngIf="toast.description" class="mt-1 text-xs text-white/70">
-              {{ toast.description }}
+            <p *ngIf="toast.description || toast.message" class="mt-1 text-xs text-white/70">
+              {{ toast.description ?? toast.message }}
             </p>
           </div>
           <button
@@ -66,12 +67,14 @@ export class ToastContainerComponent {
     this.toastService.dismiss(id);
   }
 
-  statusClass(status: 'success' | 'error' | 'info' = 'info') {
+  statusClass(status: 'success' | 'error' | 'warning' | 'info' = 'info') {
     switch (status) {
       case 'success':
-        return 'border-emerald-400/40 bg-emerald-500/15';
+        return 'border-emerald-400/60 bg-emerald-500/95 text-slate-950';
       case 'error':
-        return 'border-rose-500/40 bg-rose-500/20';
+        return 'border-rose-500/60 bg-rose-500/95 text-white';
+      case 'warning':
+        return 'border-amber-400/40 bg-amber-500/20 text-slate-950';
       default:
         return 'border-blue-400/40 bg-blue-500/15';
     }

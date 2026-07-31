@@ -2,8 +2,9 @@ import { Injectable, signal } from '@angular/core';
 
 export interface ToastOptions {
   title: string;
+  message?: string;
   description?: string;
-  status?: 'success' | 'error' | 'info';
+  status?: 'success' | 'error' | 'warning' | 'info';
   duration?: number;
   dismissible?: boolean;
 }
@@ -28,6 +29,10 @@ export class ToastService {
     this.push({ ...options, status: 'error' });
   }
 
+  warning(options: Omit<ToastOptions, 'status'>) {
+    this.push({ ...options, status: 'warning' });
+  }
+
   info(options: Omit<ToastOptions, 'status'>) {
     this.push({ ...options, status: 'info' });
   }
@@ -48,6 +53,7 @@ export class ToastService {
       duration: options.duration ?? 3500,
       dismissible: options.dismissible ?? true,
       ...options,
+      description: options.description ?? options.message,
       status: options.status ?? 'info',
     };
     this.toastsSignal.update((queue) => [...queue, toast]);
