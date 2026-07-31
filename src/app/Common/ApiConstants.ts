@@ -23,6 +23,7 @@ export class ApiConstants {
     MEMBERS_SEARCH: 'members/search',
     MEMBERS_ADD: 'add',
     MEMBERS_UPDATE: 'update',
+    MEMBERS_DELETE: 'delete',
     MEMBERS_GET_TO_TEN:'getAll',
     MEMBERS_OVERDUE: 'members/overdue',
     MEMBERS_STATS: 'members/stats',

@@ -86,8 +86,8 @@ export class GenericService<T> {
   }
 
   // DELETE
-  delete(endpoint: string, id: number | string): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.getUrl(endpoint)}/${id}`)
+  delete<TResponse = T>(endpoint: string, id: number | string): Observable<ApiResponse<TResponse>> {
+    return this.http.delete<ApiResponse<TResponse>>(`${this.getUrl(endpoint)}/${id}`)
       .pipe(
         catchError(this.handleError)
       );

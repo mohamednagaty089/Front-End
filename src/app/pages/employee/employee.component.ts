@@ -184,7 +184,7 @@ export class EmployeeComponent implements OnInit {
   
 
   promptDelete(member: Member) {
-    this.pendingDelete = member;
+    this.pendingDelete = member as Member;
   }
 
   confirmDelete(confirmed: boolean) {
@@ -192,31 +192,36 @@ export class EmployeeComponent implements OnInit {
       this.pendingDelete = null;
       return;
     }
-    // const { employeeId, employeeName } = this.pendingDelete;
-    // this.isDeleting = true;
-    // this.masterService.deleteEmpById(employeeId).subscribe(
-    //   () => {
-    //     this.isDeleting = false;
-    //     this.pendingDelete = null;
-    //     this.employeesSignal.update((list) =>
-    //       list.filter((emp) => emp.employeeId !== employeeId)
-    //     );
-    //     this.toast.success({
-    //       title: 'Employee removed',
-    //       description: `${employeeName} has been deleted.`,
-    //     });
-    //     if (this.expandedEmployeeId === employeeId) {
-    //       this.expandedEmployeeId = null;
-    //     }
-    //   },
-    //   () => {
-    //     this.isDeleting = false;
-    //     this.toast.error({
-    //       title: 'Deletion failed',
-    //       description: 'Unable to delete the employee right now.',
-    //     });
-    //   }
-    // );
+    const deletedMember = this.pendingDelete;
+    if (!deletedMember?.id) {
+      this.pendingDelete = null;
+      return;
+    }
+
+    this.isDeleting = true;
+    this.memberService.deleteMember(deletedMember.id).subscribe(
+      () => {
+        this.isDeleting = false;
+        this.pendingDelete = null;
+        this.membersSignal.update((list) =>
+          list.filter((emp) => emp.id !== deletedMember.id)
+        );
+        this.toast.success({
+          title: 'تم الحذف',
+          message: `${deletedMember.fullName} تم حذفه بنجاح.`,
+        });
+        if (this.expandedEmployeeId === deletedMember.id) {
+          this.expandedEmployeeId = null;
+        }
+      },
+      () => {
+        this.isDeleting = false;
+        this.toast.error({
+          title: 'فشل الحذف',
+          message: 'تعذر حذف المشترك الآن.',
+        });
+      }
+    );
   }
 
   updateMember(id:number) {
