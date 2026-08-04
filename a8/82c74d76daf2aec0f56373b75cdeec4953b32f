@@ -1,0 +1,20 @@
+src/app/model/interface/master.ts
+  h_63a91c69e5d960 299
+src/app/pages/project/project.component.css
+  h_63a91c69e5d960 4-577
+src/app/pages/project/project.component.html
+  h_63a91c69e5d960 6,34,52,54,67-68,70-139,145-146,148-169,173,175-176,178-200,204,206-207,209-250,252,254,256-257,259-280,282-290,298-299,355-356,358-427,433-434,436-457,461,463-468,470-488,492,494-495,497-538,540,542,544-545,547-568,570,577,586-587,617-618,621,627-628,631,637-638,640-641
+src/app/pages/project/project.component.ts
+  h_63a91c69e5d960 1-8,17-18,23,36,43-44,46,62-66,70,72-73,77-78,88-95,98,110-145,151,158,210,220-221,225,232,238,245-246,250,270,272-280
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "a882c74d76daf2aec0f56373b75cdeec4953b32f",
+  "prompts": {},
+  "humans": {
+    "h_63a91c69e5d960": {
+      "author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
