@@ -13,7 +13,7 @@
         <input
           id="project-search"
           type="search"
-          placeholder="Search projects, clients, contact person…"
+          placeholder="ابحث باسم المشترك أو التاريخ أو الملاحظات…"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
           (input)="updateSearch($any($event.target).value)"
         />
@@ -23,7 +23,7 @@
       <div
         class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/60"
       >
-        {{ filteredProjects().length }} of {{ projects().length }} projects
+        {{ filteredSubscriptions().length }} من {{ subscriptions().length }} اشتراك
       </div>
       <button
         ubButton
@@ -33,15 +33,6 @@
       >
         اضافه اشتراك
       </button>
-      <a
-        ubButton
-        size="sm"
-        variant="outline"
-        class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
-        routerLink="/new-project"
-      >
-        Open full editor
-      </a>
     </div>
   </section>
 
@@ -55,7 +46,7 @@
       </div>
     </header>
     <form
-      [formGroup]="projectForm"
+      [formGroup]="subscriptionForm"
       (ngSubmit)="onSave()"
       class="grid gap-4 md:grid-cols-2"
       [class.opacity-50]="isSaving"
@@ -147,7 +138,7 @@
         >
         <div
           class="date-field"
-          [class.has-value]="!!projectForm.get('startDate')?.value"
+          [class.has-value]="!!subscriptionForm.get('startDate')?.value"
         >
           <span class="date-field__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -177,7 +168,7 @@
         >
         <div
           class="date-field date-field--end"
-          [class.has-value]="!!projectForm.get('endDate')?.value"
+          [class.has-value]="!!subscriptionForm.get('endDate')?.value"
         >
           <span class="date-field__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -208,7 +199,7 @@
         >
         <div
           class="number-field"
-          [class.has-value]="projectForm.get('sessionsCount')?.value != null && projectForm.get('sessionsCount')?.value !== ''"
+          [class.has-value]="subscriptionForm.get('sessionsCount')?.value != null && subscriptionForm.get('sessionsCount')?.value !== ''"
         >
           <span class="number-field__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -258,7 +249,7 @@
         >
         <div
           class="notes-field"
-          [class.has-value]="!!projectForm.get('notes')?.value"
+          [class.has-value]="!!subscriptionForm.get('notes')?.value"
         >
           <span class="notes-field__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -304,53 +295,53 @@
 
   <section class="space-y-4">
     <div
-      *ngFor="let project of filteredProjects()"
+      *ngFor="let subscription of filteredSubscriptions()"
       class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
         class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleExpand(project.projectId)"
+        (click)="toggleExpand(subscription.id)"
       >
-        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center" dir="rtl">
           <span class="text-base font-semibold text-white">
-            {{ project.projectName }}
+            {{ subscription.memberName }}
           </span>
           <span
-            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:mr-4 md:mt-0"
           >
-            {{ project.clientName }}
+            {{ subscription.sessionsCount ?? 0 }} حصة
           </span>
         </div>
         <div class="flex items-center gap-3">
           <span class="text-xs text-white/60">
-            {{ formattedDate(project.startDate) }}
+            {{ formattedDate(subscription.startDate) }}
           </span>
           <span
             class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
-            [class.text-white]="expandedProjectId === project.projectId"
+            [class.text-white]="expandedSubscriptionId === subscription.id"
           >
-            {{ expandedProjectId === project.projectId ? "Hide" : "Details" }}
+            {{ expandedSubscriptionId === subscription.id ? "إخفاء" : "تفاصيل" }}
           </span>
         </div>
       </button>
 
       <div
-        *ngIf="expandedProjectId === project.projectId"
+        *ngIf="expandedSubscriptionId === subscription.id"
         class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
       >
         <ng-container
-          *ngIf="editingProjectId === project.projectId; else projectView"
+          *ngIf="editingSubscriptionId === subscription.id; else subscriptionView"
         >
           <form
-            [formGroup]="projectForm"
+            [formGroup]="subscriptionForm"
             class="grid gap-4 md:grid-cols-2"
             (ngSubmit)="onSave()"
             [class.opacity-50]="isSaving"
           >
             <div class="md:col-span-1">
               <label
-                for="edit-project-name-{{ project.projectId }}"
+                for="edit-member-{{ subscription.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
                 dir="rtl"
                 >اسم المشترك</label
@@ -358,7 +349,7 @@
               <div class="member-dropdown relative" [class.is-open]="memberDropdownOpen()">
                 <div class="member-dropdown__shell">
                   <button
-                    [id]="'edit-project-name-' + project.projectId"
+                    [id]="'edit-member-' + subscription.id"
                     type="button"
                     class="member-dropdown__trigger"
                     [class.has-value]="!!selectedMemberLabel"
@@ -428,14 +419,14 @@
             </div>
             <div class="md:col-span-1">
               <label
-                for="edit-start-{{ project.projectId }}"
+                for="edit-start-{{ subscription.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
                 dir="rtl"
                 >تاريخ بدايه الاشتراك</label
               >
               <div
                 class="date-field"
-                [class.has-value]="!!projectForm.get('startDate')?.value"
+                [class.has-value]="!!subscriptionForm.get('startDate')?.value"
               >
                 <span class="date-field__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -448,7 +439,7 @@
                 <div class="date-field__body">
                   <span class="date-field__hint">اختر تاريخ البداية</span>
                   <input
-                    [id]="'edit-start-' + project.projectId"
+                    [id]="'edit-start-' + subscription.id"
                     type="date"
                     formControlName="startDate"
                     class="date-field__input"
@@ -458,14 +449,14 @@
             </div>
             <div class="md:col-span-1">
               <label
-                for="edit-end-{{ project.projectId }}"
+                for="edit-end-{{ subscription.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
                 dir="rtl"
                 >تاريخ انتهاء الاشتراك</label
               >
               <div
                 class="date-field date-field--end"
-                [class.has-value]="!!projectForm.get('endDate')?.value"
+                [class.has-value]="!!subscriptionForm.get('endDate')?.value"
               >
                 <span class="date-field__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -479,7 +470,7 @@
                 <div class="date-field__body">
                   <span class="date-field__hint">اختر تاريخ الانتهاء</span>
                   <input
-                    [id]="'edit-end-' + project.projectId"
+                    [id]="'edit-end-' + subscription.id"
                     type="date"
                     formControlName="endDate"
                     class="date-field__input"
@@ -489,14 +480,14 @@
             </div>
             <div class="md:col-span-1">
               <label
-                for="edit-sessions-{{ project.projectId }}"
+                for="edit-sessions-{{ subscription.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
                 dir="rtl"
                 >عدد الحصص</label
               >
               <div
                 class="number-field"
-                [class.has-value]="projectForm.get('sessionsCount')?.value != null && projectForm.get('sessionsCount')?.value !== ''"
+                [class.has-value]="subscriptionForm.get('sessionsCount')?.value != null && subscriptionForm.get('sessionsCount')?.value !== ''"
               >
                 <span class="number-field__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -508,7 +499,7 @@
                 <div class="number-field__body">
                   <span class="number-field__hint">أدخل عدد الحصص</span>
                   <input
-                    [id]="'edit-sessions-' + project.projectId"
+                    [id]="'edit-sessions-' + subscription.id"
                     type="number"
                     min="0"
                     step="1"
@@ -539,14 +530,14 @@
             </div>
             <div class="md:col-span-2">
               <label
-                for="edit-notes-{{ project.projectId }}"
+                for="edit-notes-{{ subscription.id }}"
                 class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
                 dir="rtl"
                 >ملاحظات</label
               >
               <div
                 class="notes-field"
-                [class.has-value]="!!projectForm.get('notes')?.value"
+                [class.has-value]="!!subscriptionForm.get('notes')?.value"
               >
                 <span class="notes-field__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -558,7 +549,7 @@
                 <div class="notes-field__body">
                   <span class="notes-field__hint">أضف أي ملاحظات إضافية</span>
                   <textarea
-                    [id]="'edit-notes-' + project.projectId"
+                    [id]="'edit-notes-' + subscription.id"
                     rows="3"
                     formControlName="notes"
                     class="notes-field__input"
@@ -589,81 +580,52 @@
             </div>
           </form>
         </ng-container>
-        <ng-template #projectView>
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Client name
-              </p>
+        <ng-template #subscriptionView>
+          <div class="grid gap-4 sm:grid-cols-2" dir="rtl">
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">اسم المشترك</p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ project.clientName }}
+                {{ subscription.memberName || "—" }}
               </p>
             </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Start date
-              </p>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">تاريخ بدايه الاشتراك</p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ formattedDate(project.startDate) }}
+                {{ formattedDate(subscription.startDate) }}
               </p>
             </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45" dir="rtl">
-                تاريخ انتهاء الاشتراك
-              </p>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">تاريخ انتهاء الاشتراك</p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ formattedDate(project.endDate) }}
+                {{ formattedDate(subscription.endDate) }}
               </p>
             </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45" dir="rtl">
-                عدد الحصص
-              </p>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">عدد الحصص</p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ project.sessionsCount ?? "—" }}
+                {{ subscription.sessionsCount ?? "—" }}
               </p>
             </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
-            >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45" dir="rtl">
-                ملاحظات
-              </p>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">ملاحظات</p>
               <p class="mt-1 whitespace-pre-wrap text-base font-semibold text-white">
-                {{ project.contactNotes || "—" }}
+                {{ subscription.notes || "—" }}
               </p>
             </div>
-            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
-              <a
-                ubButton
-                size="sm"
-                variant="outline"
-                class="border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
-                [routerLink]="['/update-project', project.projectId || 0]"
-              >
-                Full editor
-              </a>
+            <div class="sm:col-span-2 flex justify-start gap-3 pt-2">
               <button
                 type="button"
                 class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="onEdit(project.projectId)"
+                (click)="onEdit(subscription.id)"
               >
-                Edit
+                تعديل
               </button>
               <button
                 type="button"
                 class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
-                (click)="onDelete(project.projectId)"
+                (click)="onDelete(subscription.id)"
               >
-                Delete
+                حذف
               </button>
             </div>
           </div>
@@ -672,10 +634,10 @@
     </div>
 
     <div
-      *ngIf="!filteredProjects().length"
+      *ngIf="!filteredSubscriptions().length"
       class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
-      No projects match your filters.
+      لا توجد اشتراكات مطابقة للبحث.
     </div>
   </section>
 </div>
@@ -697,21 +659,22 @@
 >
   <div
     class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    dir="rtl"
   >
     <h2 class="text-lg font-semibold text-white">
-      Delete {{ toDelete.projectName }}?
+      حذف اشتراك {{ toDelete.memberName }}؟
     </h2>
     <p class="mt-2 text-white/70">
-      This action cannot be undone. The project and its history will be removed.
+      لا يمكن التراجع عن هذا الإجراء. سيتم حذف الاشتراك نهائياً.
     </p>
-    <div class="mt-6 flex justify-end gap-3">
+    <div class="mt-6 flex justify-start gap-3">
       <button
         type="button"
         [disabled]="isDeleting"
         class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(false)"
       >
-        Cancel
+        الغاء
       </button>
       <button
         type="button"
@@ -719,8 +682,8 @@
         class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        <span *ngIf="!isDeleting">Delete project</span>
-        <span *ngIf="isDeleting">Deleting...</span>
+        <span *ngIf="!isDeleting">حذف الاشتراك</span>
+        <span *ngIf="isDeleting">جاري الحذف...</span>
       </button>
     </div>
   </div>

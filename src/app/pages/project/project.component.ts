@@ -12,13 +12,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { IProject } from '../../model/interface/master';
-import { MasterService } from '../../service/master.service';
 import { MemberService } from '../../service/memberService';
 import { Member } from '../../model/class/Member';
 import { MemberSubscription } from '../../model/class/MemberSubscription';
 import { DatePipe, CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ApiResponse } from '@/app/service/genericService';
@@ -26,36 +23,36 @@ import { ApiResponse } from '@/app/service/genericService';
 @Component({
   selector: 'app-project',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UbButtonDirective, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, UbButtonDirective],
   providers: [DatePipe],
   templateUrl: './project.component.html',
-  styleUrls: ['./project.component.css'], // Corrected from styleUrl to styleUrls
+  styleUrls: ['./project.component.css'],
 })
 export class ProjectComponent implements OnInit {
-  protected readonly routerLinkDirective = RouterLink;
-  private readonly masterSrv = inject(MasterService);
   private readonly memberService = inject(MemberService);
   private readonly datePipe = inject(DatePipe);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
-  private readonly projectsSignal = signal<IProject[]>([]);
-  readonly projects = this.projectsSignal.asReadonly();
+  private readonly subscriptionsSignal = signal<MemberSubscription[]>([]);
+  readonly subscriptions = this.subscriptionsSignal.asReadonly();
   private readonly membersSignal = signal<Member[]>([]);
   readonly members = this.membersSignal.asReadonly();
   readonly searchTerm = signal<string>('');
   readonly memberDropdownOpen = signal(false);
-  readonly filteredProjects = computed(() => {
+
+  readonly filteredSubscriptions = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
-      return this.projects();
+      return this.subscriptions();
     }
-    return this.projects().filter((project) => {
+    return this.subscriptions().filter((subscription) => {
       return (
-        project.projectName?.toLowerCase().includes(term) ||
-        project.clientName?.toLowerCase().includes(term) ||
-        project.contactPerson?.toLowerCase().includes(term) ||
-        project.startDate?.toLowerCase().includes(term)
+        subscription.memberName?.toLowerCase().includes(term) ||
+        subscription.startDate?.toLowerCase().includes(term) ||
+        subscription.endDate?.toLowerCase().includes(term) ||
+        subscription.notes?.toLowerCase().includes(term) ||
+        String(subscription.sessionsCount ?? '').includes(term)
       );
     });
   });
@@ -65,7 +62,6 @@ export class ProjectComponent implements OnInit {
     return value ? String(value) : '';
   }
 
-  /** Form group for member subscription renewal */
   subscriptionForm: FormGroup = this.fb.group({
     id: [null],
     memberId: [null, Validators.required],
@@ -76,15 +72,10 @@ export class ProjectComponent implements OnInit {
     notes: [''],
   });
 
-  /** Keep alias so existing template bindings to projectForm still work during rename */
-  get projectForm(): FormGroup {
-    return this.subscriptionForm;
-  }
-
-  expandedProjectId: number | null = null;
-  editingProjectId: number | null = null;
+  expandedSubscriptionId: number | null = null;
+  editingSubscriptionId: number | null = null;
   showCreatePanel = false;
-  pendingDelete: IProject | null = null;
+  pendingDelete: MemberSubscription | null = null;
   isSaving = false;
   isDeleting = false;
 
@@ -97,16 +88,28 @@ export class ProjectComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getProjects();
+    this.getSubscriptions();
     this.getMembers();
   }
 
-  getProjects() {
-    this.masterSrv.getAllProjects().subscribe((Res: IProject[]) => {
-      this.projectsSignal.set(Res ?? []);
-      if (!this.expandedProjectId && Res?.length) {
-        this.expandedProjectId = Res[0].projectId ?? null;
-      }
+  getSubscriptions() {
+    this.memberService.getAllMemberSubscriptions().subscribe({
+      next: (res: ApiResponse<MemberSubscription[]>) => {
+        const list = (res?.data ?? []).map(
+          (item) => new MemberSubscription(item)
+        );
+        this.subscriptionsSignal.set(list);
+        if (!this.expandedSubscriptionId && list.length) {
+          this.expandedSubscriptionId = list[0].id ?? null;
+        }
+      },
+      error: () => {
+        this.subscriptionsSignal.set([]);
+        this.toast.error({
+          title: 'تعذر التحميل',
+          description: 'تعذر تحميل الاشتراكات حالياً.',
+        });
+      },
     });
   }
 
@@ -149,74 +152,76 @@ export class ProjectComponent implements OnInit {
   }
 
   onEdit(id: number) {
-    const project = this.projects().find((p) => p.projectId === id);
-    if (!project) {
+    const subscription = this.subscriptions().find((item) => item.id === id);
+    if (!subscription) {
       return;
     }
     this.memberDropdownOpen.set(false);
     this.showCreatePanel = false;
-    this.editingProjectId = id;
-    this.expandedProjectId = id;
-
-    const matchedMember = this.members().find(
-      (member) =>
-        member.fullName === project.projectName ||
-        member.fullName === project.clientName
-    );
+    this.editingSubscriptionId = id;
+    this.expandedSubscriptionId = id;
 
     this.subscriptionForm.patchValue({
-      id: project.projectId ?? null,
-      memberId: matchedMember?.id ?? null,
-      memberName: project.projectName || project.clientName || '',
-      startDate: project.startDate ? project.startDate.substring(0, 10) : '',
-      endDate: project.endDate ? project.endDate.substring(0, 10) : '',
-      sessionsCount: project.sessionsCount ?? null,
-      notes: project.contactNotes ?? '',
+      id: subscription.id ?? null,
+      memberId: subscription.memberId ?? null,
+      memberName: subscription.memberName ?? '',
+      startDate: subscription.startDate
+        ? String(subscription.startDate).substring(0, 10)
+        : '',
+      endDate: subscription.endDate
+        ? String(subscription.endDate).substring(0, 10)
+        : '',
+      sessionsCount: subscription.sessionsCount ?? null,
+      notes: subscription.notes ?? '',
     });
   }
 
   onDelete(id: number) {
-    const project = this.projects().find((p) => p.projectId === id);
-    if (!project) return;
-    this.pendingDelete = project;
+    const subscription = this.subscriptions().find((item) => item.id === id);
+    if (!subscription) return;
+    this.pendingDelete = subscription;
   }
 
   confirmDelete(confirmed: boolean) {
-    if (!confirmed || !this.pendingDelete?.projectId) {
+    if (!confirmed || !this.pendingDelete?.id) {
       this.pendingDelete = null;
       return;
     }
-    const { projectId, projectName } = this.pendingDelete;
+    const { id, memberName } = this.pendingDelete;
     this.isDeleting = true;
-    this.masterSrv.deleteProjectById(projectId).subscribe(
-      () => {
+    this.memberService.deleteMemberSubscription(id).subscribe({
+      next: () => {
         this.isDeleting = false;
         this.pendingDelete = null;
-        this.projectsSignal.update((list) =>
-          list.filter((project) => project.projectId !== projectId)
+        this.subscriptionsSignal.update((list) =>
+          list.filter((item) => item.id !== id)
         );
         this.toast.success({
-          title: 'Project deleted',
-          description: `${projectName} has been removed.`,
+          title: 'تم الحذف',
+          description: `تم حذف اشتراك ${memberName} بنجاح.`,
         });
-        if (this.expandedProjectId === projectId) {
-          this.expandedProjectId = null;
+        if (this.expandedSubscriptionId === id) {
+          this.expandedSubscriptionId = null;
+        }
+        if (this.editingSubscriptionId === id) {
+          this.cancelEdit();
         }
       },
-      () => {
+      error: () => {
         this.isDeleting = false;
         this.toast.error({
-          title: 'Delete failed',
-          description: 'Something went wrong while removing the project.',
+          title: 'فشل الحذف',
+          description: 'تعذر حذف الاشتراك حالياً.',
         });
-      }
-    );
+      },
+    });
   }
 
-  toggleExpand(projectId: number | null | undefined) {
-    const target = projectId ?? null;
-    this.expandedProjectId = this.expandedProjectId === target ? null : target;
-    if (this.expandedProjectId !== this.editingProjectId) {
+  toggleExpand(subscriptionId: number | null | undefined) {
+    const target = subscriptionId ?? null;
+    this.expandedSubscriptionId =
+      this.expandedSubscriptionId === target ? null : target;
+    if (this.expandedSubscriptionId !== this.editingSubscriptionId) {
       this.cancelEdit();
     }
   }
@@ -225,8 +230,8 @@ export class ProjectComponent implements OnInit {
     this.isSaving = false;
     this.memberDropdownOpen.set(false);
     this.showCreatePanel = true;
-    this.editingProjectId = null;
-    this.expandedProjectId = null;
+    this.editingSubscriptionId = null;
+    this.expandedSubscriptionId = null;
     const today = new Date().toISOString().substring(0, 10);
     this.subscriptionForm.reset({
       id: null,
@@ -248,7 +253,7 @@ export class ProjectComponent implements OnInit {
   cancelEdit() {
     this.isSaving = false;
     this.memberDropdownOpen.set(false);
-    this.editingProjectId = null;
+    this.editingSubscriptionId = null;
     this.subscriptionForm.reset({
       id: null,
       memberId: null,
@@ -264,7 +269,6 @@ export class ProjectComponent implements OnInit {
     this.searchTerm.set(term);
   }
 
-  /** Build MemberSubscription from the subscription form group */
   private buildMemberSubscription(): MemberSubscription {
     const formValue = this.subscriptionForm.getRawValue();
     return new MemberSubscription({
@@ -303,7 +307,7 @@ export class ProjectComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isSaving = false;
-            this.getProjects();
+            this.getSubscriptions();
             this.toast.success({
               title: 'تم التحديث',
               description: 'تم حفظ تعديلات الاشتراك بنجاح.',
@@ -322,7 +326,7 @@ export class ProjectComponent implements OnInit {
       this.memberService.createMemberSubscription(subscription).subscribe({
         next: () => {
           this.isSaving = false;
-          this.getProjects();
+          this.getSubscriptions();
           this.toast.success({
             title: 'تم الحفظ',
             description: 'تم تجديد الاشتراك بنجاح.',

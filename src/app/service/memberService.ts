@@ -35,11 +35,16 @@ export class MemberService extends GenericService<Member> {
     return this.delete<boolean>(endpoint, id);
   }
 
+  getAllMemberSubscriptions(): Observable<ApiResponse<MemberSubscription[]>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS}/${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS_GET_ALL}`;
+    return this.get<MemberSubscription[]>(endpoint);
+  }
+
   createMemberSubscription(
     subscription: MemberSubscription
   ): Observable<ApiResponse<MemberSubscription>> {
     const endpoint = `${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS}/${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS_ADD}`;
-    return this.create<MemberSubscription>(endpoint, subscription ) ;
+    return this.create<MemberSubscription>(endpoint, subscription);
   }
 
   updateMemberSubscription(
@@ -47,7 +52,11 @@ export class MemberService extends GenericService<Member> {
     subscription: MemberSubscription
   ): Observable<ApiResponse<MemberSubscription>> {
     const endpoint = `${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS}/${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS_UPDATE}`;
-    return this.update<MemberSubscription>(endpoint, id, subscription as any) 
-}
+    return this.update<MemberSubscription>(endpoint, id, subscription);
+  }
 
+  deleteMemberSubscription(id: number): Observable<ApiResponse<boolean>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS}/${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS_DELETE}`;
+    return this.delete<boolean>(endpoint, id);
+  }
 }
