@@ -1,0 +1,740 @@
+<div class="space-y-8 text-white/85">
+  <section
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="w-full sm:max-w-sm">
+      <label for="employee-search" class="sr-only">Search employees</label>
+      <div class="relative">
+        <span
+          class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
+          aria-hidden="true"
+          >🔍</span
+        >
+        <input
+          id="employee-search"
+          type="search"
+          placeholder="البحث"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
+          (input)="updateSearch($any($event.target).value)"
+        />
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div
+        class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/60"
+      >
+        {{ filteredMembers().length }} : {{ members().length }} مشتركين
+      </div>
+      <button
+        ubButton
+        size="sm"
+        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        (click)="startCreate()"
+      >
+        اضافة مشترك جديد
+      </button>
+    </div>
+  </section>
+
+  <section
+    *ngIf="showCreatePanel"
+    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+  >
+    <header class="mb-6 text-center">
+      <div class="text-center w-full">
+        <h2 class="text-lg font-semibold text-white mx-auto">اضافة مشترك جديد</h2>
+        <!-- <p class="text-xs uppercase tracking-[0.3em] text-white/50">
+          Quick onboarding form
+        </p> -->
+      </div>
+    </header>
+    <form
+      [formGroup]="memberForm"
+      (ngSubmit)="saveMember()"
+      class="grid gap-4 sm:grid-cols-2"
+      [class.opacity-50]="isSaving"
+    >
+     
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-dept"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >العنوان</label
+        >
+        <input
+          dir="rtl"
+          id="create-dept"
+          type="text"
+          formControlName="address"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+       <div class="sm:col-span-1">
+        <label
+          for="create-name"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >اسم المشترك <span class="text-rose-400">*</span></label
+        >
+              <!-- placeholder="الاسم" -->
+        <input
+            dir="rtl"
+          id="create-name"
+          type="text"
+          formControlName="fullName"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-deptid"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >رقم الهاتف <span class="text-rose-400">*</span></label
+        >
+        <input
+          dir="rtl"
+          id="create-deptid"
+          type="number"
+          formControlName="phoneNumber"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-role"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >البريد الاكتروني</label
+        >
+        <input
+          dir="rtl"
+          id="create-role"
+          type="text"
+          formControlName="email"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+
+   <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-hireDate"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >تاريخ الميلاد</label
+        >
+        <input
+          dir="rtl"
+          id="create-hireDate"
+          type="date"
+          formControlName="birthDate"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-title"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الرقم القومي</label
+        >
+        <input
+          dir="rtl"
+          id="create-title"
+          type="text"
+          formControlName="nationalId"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-employment"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الكود</label
+        >
+        <input
+          dir="rtl"
+          id="create-employment"
+          type="text"
+          formControlName="code"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-phone"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >نوع الاشتراك</label
+        >
+        <select
+          dir="rtl"
+          id="create-phone"
+          formControlName="membershipType"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        >
+          <option value="" disabled hidden>اختر نوع الاشتراك</option>
+          <option *ngFor="let type of subscriptionTypes" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+      <!-- <div class="sm:col-span-1">
+        <label
+          for="create-email"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >Email <span class="text-rose-400">*</span></label
+        >
+        <input
+          dir="rtl"
+          id="create-email"
+          type="email"
+          formControlName="emailId"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="person@example.com"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-location"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Location</label
+        >
+        <input
+          id="create-location"
+          type="text"
+          formControlName="location"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Berlin"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-timezone"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Timezone</label
+        >
+        <input
+          id="create-timezone"
+          type="text"
+          formControlName="timezone"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Europe/Berlin"
+        />
+      </div>
+   
+      <div class="sm:col-span-1">
+        <label
+          for="create-skills"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Skills (comma separated)</label
+        >
+        <input
+          id="create-skills"
+          type="text"
+          formControlName="skills"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Angular, TypeScript"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-tags"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Tags (comma separated)</label
+        >
+        <input
+          id="create-tags"
+          type="text"
+          formControlName="tags"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="mentor, remote"
+        />
+      </div> -->
+      <div dir="ltr" class="sm:col-span-2 flex items-center justify-start gap-2 pt-2">
+        <button
+          type="button"
+          [disabled]="isSaving"
+          class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="closeCreatePanel()"
+        >
+          الغاء
+        </button>
+        <button
+          type="submit"
+          ubButton
+          size="sm"
+          [disabled]="isSaving"
+          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isSaving">حفظ</span>
+          <span *ngIf="isSaving">تم الحفظ بنجاح...</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="space-y-4">
+    <div
+      *ngFor="let member of filteredMembers(); let idx = index"
+      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+    >
+      <button
+        type="button"
+        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        (click)="toggleExpand(member.id)"
+      >
+        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+          <span
+            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-semibold text-white/80 shadow-inner shadow-slate-950/25"
+          >
+            {{ idx + 1 }}
+          </span>
+          <span class="font-semibold text-white md:ml-4 md:text-base">
+            {{ member.fullName }}
+          </span>
+          <span
+            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+          >
+            {{ member.phone }}
+          </span>
+          <span
+            class="mt-1 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+          >
+            {{ member.address }}
+          </span>
+        </div>
+        <span
+          class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
+          [class.text-white]="expandedEmployeeId === member.id"
+        >
+          {{ expandedEmployeeId === member.id ? "Hide" : "Details" }}
+        </span>
+      </button>
+
+      <div
+        *ngIf="expandedEmployeeId === member.id"
+        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+      >
+        <ng-container
+          *ngIf="editingEmployeeId === member.id; else viewMode"
+        >
+          <form
+      [formGroup]="memberForm"
+      (ngSubmit)="updateMember(member.id)"
+      class="grid gap-4 sm:grid-cols-2"
+      [class.opacity-50]="isSaving"
+    >
+     
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-dept"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >العنوان</label
+        >
+        <input
+          dir="rtl"
+          id="create-dept"
+          type="text"
+          formControlName="address"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+       <div class="sm:col-span-1">
+        <label
+          for="create-name"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >اسم المشترك <span class="text-rose-400">*</span></label
+        >
+              <!-- placeholder="الاسم" -->
+        <input
+            dir="rtl"
+          id="create-name"
+          type="text"
+          formControlName="fullName"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-deptid"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >رقم الهاتف <span class="text-rose-400">*</span></label
+        >
+        <input
+          dir="rtl"
+          id="create-deptid"
+          type="number"
+          formControlName="phoneNumber"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-role"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >البريد الاكتروني</label
+        >
+        <input
+          dir="rtl"
+          id="create-role"
+          type="text"
+          formControlName="email"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+
+   <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-hireDate"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >تاريخ الميلاد</label
+        >
+        <input
+          dir="rtl"
+          id="create-hireDate"
+          type="date"
+          formControlName="birthDate"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-title"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الرقم القومي</label
+        >
+        <input
+          dir="rtl"
+          id="create-title"
+          type="text"
+          formControlName="nationalId"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-employment"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >الكود</label
+        >
+        <input
+          dir="rtl"
+          id="create-employment"
+          type="text"
+          formControlName="code"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          dir="rtl"
+          for="create-phone"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >نوع الاشتراك</label
+        >
+        <select
+          dir="rtl"
+          id="create-phone"
+          formControlName="membershipType"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+        >
+          <option value="" disabled hidden>اختر نوع الاشتراك</option>
+          <option *ngFor="let type of subscriptionTypes" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+      <!-- <div class="sm:col-span-1">
+        <label
+          for="create-email"
+          class="mb-2 block w-full text-center text-xs uppercase tracking-[0.35em] text-white/60"
+          >Email <span class="text-rose-400">*</span></label
+        >
+        <input
+          dir="rtl"
+          id="create-email"
+          type="email"
+          formControlName="emailId"
+          required
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 text-right outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="person@example.com"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-location"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Location</label
+        >
+        <input
+          id="create-location"
+          type="text"
+          formControlName="location"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Berlin"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-timezone"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Timezone</label
+        >
+        <input
+          id="create-timezone"
+          type="text"
+          formControlName="timezone"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Europe/Berlin"
+        />
+      </div>
+   
+      <div class="sm:col-span-1">
+        <label
+          for="create-skills"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Skills (comma separated)</label
+        >
+        <input
+          id="create-skills"
+          type="text"
+          formControlName="skills"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="Angular, TypeScript"
+        />
+      </div>
+      <div class="sm:col-span-1">
+        <label
+          for="create-tags"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Tags (comma separated)</label
+        >
+        <input
+          id="create-tags"
+          type="text"
+          formControlName="tags"
+          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          placeholder="mentor, remote"
+        />
+      </div> -->
+      <div dir="ltr" class="sm:col-span-2 flex items-center justify-start gap-2 pt-2">
+        <button
+          type="button"
+          [disabled]="isSaving"
+          class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="cancelEdit()"
+        >
+          الغاء
+        </button>
+        <button
+          type="submit"
+          ubButton
+          size="sm"
+          [disabled]="isSaving"
+          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isSaving">تعديل</span>
+          <span *ngIf="isSaving">تم الحفظ بنجاح...</span>
+        </button>
+      </div>
+    </form>
+        </ng-container>
+        <ng-template #viewMode>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                رقم المشترك
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ member.id }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                الاسم
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ member.fullName || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                العنوان
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{member.address || '—' }}
+              </p>
+            </div>
+            <!-- <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Role & Title
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.role || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.title || '—' }}
+              </p>
+            </div> -->
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                البريد الاكتروني
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ member.email || '—' }}
+              </p>
+            </div>
+            <!-- <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Contact
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.contactNo || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.emailId || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Location
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ employee.location || '—' }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.timezone || '—' }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Hire Date
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  employee.hireDate
+                    ? (employee.hireDate | date: 'mediumDate')
+                    : (employee.createdAt
+                        ? (employee.createdAt | date: 'mediumDate')
+                        : '—')
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Skills
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  employee.skills && employee.skills.length
+                    ? employee.skills.join(', ')
+                    : '—'
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Tags
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{
+                  member.tags && member.tags.length
+                    ? member.tags.join(', ')
+                    : '—'
+                }}
+              </p>
+            </div> -->
+            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="onEdit(member)"
+              >
+                تعديل
+              </button>
+              <button
+                type="button"
+                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                (click)="promptDelete(member)"
+              >
+                حذف
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!filteredMembers().length"
+      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+    >
+      لا يوجد مشترك يطابق عوامل التصفية.
+  </div>
+  </section>
+        </div>
+
+<div
+  *ngIf="pendingDelete as toDelete"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
+  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+>
+  <div
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+  >
+    <h2 class="text-lg font-semibold text-white">
+      حذف {{ toDelete.fullName }}؟
+    </h2>
+    <p class="mt-2 text-white/70">
+      لا يمكن التراجع عن هذا الإجراء. سيتم حذف سجل المشترك نهائيًا من النظام.
+    </p>
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(false)"
+      >
+        الغاء
+      </button>
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(true)"
+      >
+        <span *ngIf="!isDeleting">حذف المشترك</span>
+        <span *ngIf="isDeleting">جارٍ الحذف...</span>
+      </button>
+    </div>
+  </div>
+</div>

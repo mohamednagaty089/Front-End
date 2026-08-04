@@ -1,0 +1,524 @@
+<div class="space-y-8 text-white/85">
+  <section
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between"
+  >
+    <div class="w-full lg:max-w-xl">
+      <label for="assignment-search" class="sr-only">Search assignments</label>
+      <div class="relative">
+        <span
+          aria-hidden="true"
+          class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
+          >🔍</span
+        >
+        <input
+          id="assignment-search"
+          type="search"
+          placeholder="Search project, employee, role or date…"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(99,102,241,0.25)]"
+          (input)="updateSearch($any($event.target).value)"
+        />
+      </div>
+    </div>
+    <div
+      class="flex flex-wrap items-center justify-end gap-3 text-xs text-white/60"
+    >
+      <span
+        class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium"
+      >
+        {{ filteredAssignments().length }} of {{ assignments().length }}
+        assignments
+      </span>
+      <span
+        class="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-4 py-2 text-xs font-medium text-emerald-200"
+      >
+        Active: {{ metrics().active }}
+      </span>
+      <span
+        class="rounded-full border border-slate-400/30 bg-slate-500/20 px-4 py-2 text-xs font-medium text-slate-200"
+      >
+        Inactive: {{ metrics().inactive }}
+      </span>
+      <button
+        ubButton
+        size="sm"
+        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        (click)="toggleCreatePanel()"
+      >
+        {{ showCreatePanel ? 'Close form' : 'Add assignment' }}
+      </button>
+    </div>
+  </section>
+
+  <section
+    *ngIf="showCreatePanel"
+    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+  >
+    <header class="mb-6">
+      <h2 class="text-lg font-semibold text-white">Add project assignment</h2>
+      <p class="text-xs uppercase tracking-[0.3em] text-white/55">
+        Connect team members to initiatives
+      </p>
+    </header>
+    <form
+      [formGroup]="projectEmployeeForm"
+      (ngSubmit)="onSave()"
+      class="grid gap-4 md:grid-cols-2"
+      [class.opacity-50]="isSaving"
+    >
+      <div>
+        <label
+          for="create-project"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Project</label
+        >
+        <select
+          id="create-project"
+          formControlName="projectId"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+        >
+          <option value="">Select project</option>
+          <option *ngFor="let project of projects()" [ngValue]="project.projectId">
+            {{ project.projectName }}
+          </option>
+        </select>
+      </div>
+      <div>
+        <label
+          for="create-employee"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Team member</label
+        >
+        <select
+          id="create-employee"
+          formControlName="empId"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+        >
+          <option value="">Select teammate</option>
+          <option *ngFor="let employee of employees()" [ngValue]="employee.employeeId">
+            {{ employee.employeeName }}
+          </option>
+        </select>
+      </div>
+      <div>
+        <label
+          for="create-date"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Assigned date</label
+        >
+        <input
+          id="create-date"
+          type="date"
+          formControlName="assignedDate"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div>
+        <label
+          for="create-role"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Role</label
+        >
+        <input
+          id="create-role"
+          type="text"
+          formControlName="role"
+          placeholder="Product Owner"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+        />
+      </div>
+      <div>
+        <label
+          for="create-allocation"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Allocation (%)</label
+        >
+        <input
+          id="create-allocation"
+          type="number"
+          min="0"
+          max="200"
+          formControlName="allocationPct"
+          placeholder="0"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+        />
+        <p
+          *ngIf="
+            projectEmployeeForm.controls['allocationPct'].invalid &&
+            (projectEmployeeForm.controls['allocationPct'].dirty ||
+              projectEmployeeForm.controls['allocationPct'].touched)
+          "
+          class="mt-1 text-xs text-rose-300"
+        >
+          Enter a value between 0 and 200.
+        </p>
+      </div>
+      <div class="flex items-center gap-3 pt-2">
+        <span class="text-xs uppercase tracking-[0.35em] text-white/60"
+          >Active</span
+        >
+        <button
+          type="button"
+          class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          (click)="projectEmployeeForm.patchValue({ isActive: !projectEmployeeForm.value.isActive })"
+          [ngClass]="{
+            'bg-emerald-500/30': projectEmployeeForm.value.isActive
+          }"
+        >
+          <span
+            class="h-7 w-7 rounded-full bg-white/80 transition"
+            [class.translate-x-7]="projectEmployeeForm.value.isActive"
+          ></span>
+        </button>
+        <span class="text-xs text-white/70">
+          {{ projectEmployeeForm.value.isActive ? 'Active assignment' : 'Inactive' }}
+        </span>
+      </div>
+      <div class="md:col-span-2">
+        <label
+          for="create-notes"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          >Notes (Optional)</label
+        >
+        <textarea
+          id="create-notes"
+          formControlName="notes"
+          rows="3"
+          placeholder="Add any notes or context about this assignment..."
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
+        ></textarea>
+      </div>
+      <div class="md:col-span-2 flex justify-end gap-3 pt-4">
+        <button
+          type="submit"
+          ubButton
+          size="sm"
+          [disabled]="isSaving"
+          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isSaving">Save assignment</span>
+          <span *ngIf="isSaving">Saving assignment...</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="space-y-4">
+    <div
+      *ngFor="let item of filteredAssignments()"
+      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+    >
+      <button
+        type="button"
+        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        (click)="toggleExpand(item.empProjectId)"
+      >
+        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+          <span class="text-base font-semibold text-white">
+            {{ item.projectName }}
+          </span>
+          <span
+            class="mt-1 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+            {{ item.employeeName }}
+          </span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span
+            [class]="statusBadge(item.isActive)"
+            class="transition"
+          >
+            {{ isActive(item.isActive) ? 'Active' : 'Inactive' }}
+          </span>
+          <span class="text-xs text-white/60">
+            {{ formattedDate(item.assignedDate) }}
+          </span>
+          <span
+            class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
+            [class.text-white]="expandedAssignmentId === item.empProjectId"
+          >
+            {{ expandedAssignmentId === item.empProjectId ? 'Hide' : 'Details' }}
+          </span>
+        </div>
+      </button>
+
+      <div
+        *ngIf="expandedAssignmentId === item.empProjectId"
+        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+      >
+        <ng-container
+          *ngIf="editingAssignmentId === item.empProjectId; else assignmentView"
+        >
+          <form
+            [formGroup]="projectEmployeeForm"
+            (ngSubmit)="onSave()"
+            class="grid gap-4 md:grid-cols-2"
+            [class.opacity-50]="isSaving"
+          >
+            <div>
+              <label
+                [for]="'edit-project-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Project</label
+              >
+              <select
+                [id]="'edit-project-' + item.empProjectId"
+                formControlName="projectId"
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+              >
+                <option value="">Select project</option>
+                <option
+                  *ngFor="let project of projects()"
+                  [ngValue]="project.projectId"
+                >
+                  {{ project.projectName }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label
+                [for]="'edit-employee-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Team member</label
+              >
+              <select
+                [id]="'edit-employee-' + item.empProjectId"
+                formControlName="empId"
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+              >
+                <option value="">Select teammate</option>
+                <option
+                  *ngFor="let employee of employees()"
+                  [ngValue]="employee.employeeId"
+                >
+                  {{ employee.employeeName }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label
+                [for]="'edit-date-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Assigned date</label
+              >
+              <input
+                [id]="'edit-date-' + item.empProjectId"
+                type="date"
+                formControlName="assignedDate"
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div>
+              <label
+                [for]="'edit-role-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Role</label
+              >
+              <input
+                [id]="'edit-role-' + item.empProjectId"
+                type="text"
+                formControlName="role"
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div>
+              <label
+                [for]="'edit-allocation-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Allocation (%)</label
+              >
+              <input
+                [id]="'edit-allocation-' + item.empProjectId"
+                type="number"
+                min="0"
+                max="200"
+                formControlName="allocationPct"
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+              />
+              <p
+                *ngIf="
+                  projectEmployeeForm.controls['allocationPct'].invalid &&
+                  (projectEmployeeForm.controls['allocationPct'].dirty ||
+                    projectEmployeeForm.controls['allocationPct'].touched)
+                "
+                class="mt-1 text-xs text-rose-300"
+              >
+                Enter a value between 0 and 200.
+              </p>
+            </div>
+            <div class="flex items-center gap-3 pt-2">
+              <span class="text-xs uppercase tracking-[0.3em] text-white/55"
+                >Active</span
+              >
+              <button
+                type="button"
+                class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                (click)="projectEmployeeForm.patchValue({ isActive: !projectEmployeeForm.value.isActive })"
+                [ngClass]="{
+                  'bg-emerald-500/30': projectEmployeeForm.value.isActive
+                }"
+              >
+                <span
+                  class="h-7 w-7 rounded-full bg-white/80 transition"
+                  [class.translate-x-7]="projectEmployeeForm.value.isActive"
+                ></span>
+              </button>
+              <span class="text-xs text-white/70">
+                {{ projectEmployeeForm.value.isActive ? 'Active assignment' : 'Inactive' }}
+              </span>
+            </div>
+            <div class="md:col-span-2">
+              <label
+                [for]="'edit-notes-' + item.empProjectId"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/55"
+                >Notes (Optional)</label
+              >
+              <textarea
+                [id]="'edit-notes-' + item.empProjectId"
+                formControlName="notes"
+                rows="3"
+                placeholder="Add any notes or context about this assignment..."
+                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
+              ></textarea>
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-3 pt-4">
+              <button
+                type="button"
+                [disabled]="isSaving"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                ubButton
+                size="sm"
+                [disabled]="isSaving"
+                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span *ngIf="!isSaving">Save changes</span>
+                <span *ngIf="isSaving">Updating...</span>
+              </button>
+            </div>
+          </form>
+        </ng-container>
+        <ng-template #assignmentView>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Assigned role
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ item.role }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Assigned on
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ formattedDate(item.assignedDate) }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Employee ID
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ item.empId }} · {{ employeeNameFor(item.empId) || '—' }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Project ID
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ item.projectId }} · {{ projectNameFor(item.projectId) || '—' }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Allocation
+              </p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ item.allocationPct ?? 0 }}%
+              </p>
+            </div>
+            <div
+              *ngIf="item.notes && item.notes.trim()"
+              class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+                Notes
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
+                {{ item.notes }}
+              </p>
+            </div>
+            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="onEdit(item)"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                (click)="onDelete(item.empProjectId)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!filteredAssignments().length"
+      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+    >
+      No assignments match your filters.
+    </div>
+  </section>
+</div>
+
+<div
+  *ngIf="pendingDelete as assignment"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
+  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+>
+  <div
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+  >
+    <h2 class="text-lg font-semibold text-white">
+      Remove {{ assignment.employeeName }} from {{ assignment.projectName }}?
+    </h2>
+    <p class="mt-2 text-white/70">
+      This person will no longer appear on the project roster. You can reassign
+      them anytime.
+    </p>
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(false)"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        [disabled]="isDeleting"
+        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="confirmDelete(true)"
+      >
+        <span *ngIf="!isDeleting">Remove assignment</span>
+        <span *ngIf="isDeleting">Deleting...</span>
+      </button>
+    </div>
+  </div>
+</div>

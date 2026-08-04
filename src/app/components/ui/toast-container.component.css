@@ -1,0 +1,21 @@
+.toast-enter {
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+}
+
+.toast-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.toast-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast-exit-active {
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
