@@ -1,0 +1,36 @@
+src/app/app.routes.ts
+  s_941acfe98e913a::t_6fa97167b49c0c 13
+  s_941acfe98e913a::t_eb90ef008d743c 58-64
+  s_941acfe98e913a::t_711c9dba35b6cf 57
+src/app/pages/attendance/attendance.component.ts
+  s_941acfe98e913a::t_f2ffa091c9130e 27
+  s_941acfe98e913a::t_863bbc68eed2b7 1-4,6-26,28-130,132-256
+  s_941acfe98e913a::t_2328a1ca893a25 5
+  s_941acfe98e913a::t_61aaef8b822dc2 131
+src/app/pages/layout/layout.component.html
+  s_941acfe98e913a::t_32e9838eed6251 29-36
+src/app/model/class/AttendanceRecord.ts
+  s_941acfe98e913a::t_56533d83aa3962 1-8
+src/app/pages/attendance/attendance.component.html
+  s_941acfe98e913a::t_3561d0c582fc6a 1-164
+src/app/pages/attendance/attendance.component.css
+  s_941acfe98e913a::t_e9f658a6c86953 1-4,9-162,165-485
+  s_941acfe98e913a::t_c8c5fec4404ca5 163-164
+  s_941acfe98e913a::t_8ce1069426b7c6 5-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "72997e68964dab4ca261da5cfc7e5b996e283319",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
