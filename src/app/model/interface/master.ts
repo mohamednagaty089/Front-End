@@ -296,6 +296,7 @@ export interface IProject {
   employeeName: string;
   clientIndustry?: string;
   endDate?: string;
+  sessionsCount?: number;
   sponsorEmpId?: number;
   contactProfile?: IContactProfile;
   contactTitle?: string;

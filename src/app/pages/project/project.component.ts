@@ -1,4 +1,11 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  signal,
+  inject,
+  HostListener,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,10 +14,13 @@ import {
 } from '@angular/forms';
 import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
+import { MemberService } from '../../service/memberService';
+import { Member } from '../../model/class/Member';
 import { DatePipe, CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
+import { ApiResponse } from '@/app/service/genericService';
 
 @Component({
   selector: 'app-project',
@@ -23,13 +33,17 @@ import { UbButtonDirective } from '@/app/components/ui/button';
 export class ProjectComponent implements OnInit {
   protected readonly routerLinkDirective = RouterLink;
   private readonly masterSrv = inject(MasterService);
+  private readonly memberService = inject(MemberService);
   private readonly datePipe = inject(DatePipe);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
   private readonly projectsSignal = signal<IProject[]>([]);
   readonly projects = this.projectsSignal.asReadonly();
+  private readonly membersSignal = signal<Member[]>([]);
+  readonly members = this.membersSignal.asReadonly();
   readonly searchTerm = signal<string>('');
+  readonly memberDropdownOpen = signal(false);
   readonly filteredProjects = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
@@ -45,15 +59,23 @@ export class ProjectComponent implements OnInit {
     });
   });
 
+  get selectedMemberLabel(): string {
+    const value = this.projectForm.get('projectName')?.value;
+    return value ? String(value) : '';
+  }
+
   projectForm: FormGroup = this.fb.group({
     projectId: [null],
     projectName: ['', Validators.required],
-    clientName: ['', Validators.required],
+    clientName: [''],
     startDate: ['', Validators.required],
+    endDate: [''],
+    sessionsCount: [null],
     leadByEmpId: [null],
     contactPerson: [''],
     contactNo: [''],
-    emailId: ['', Validators.email],
+    contactNotes: [''],
+    emailId: [''],
   });
 
   expandedProjectId: number | null = null;
@@ -63,8 +85,17 @@ export class ProjectComponent implements OnInit {
   isSaving = false;
   isDeleting = false;
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.member-dropdown')) {
+      this.memberDropdownOpen.set(false);
+    }
+  }
+
   ngOnInit(): void {
     this.getProjects();
+    this.getMembers();
   }
 
   getProjects() {
@@ -76,17 +107,55 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  getMembers() {
+    this.memberService.getTopTenMembers().subscribe((res: ApiResponse<Member[]>) => {
+      this.membersSignal.set(res?.data ?? []);
+    });
+  }
+
+  toggleMemberDropdown(event?: Event) {
+    event?.stopPropagation();
+    this.memberDropdownOpen.update((open) => !open);
+  }
+
+  selectMember(member: Member) {
+    this.projectForm.patchValue({
+      projectName: member.fullName,
+      clientName: member.fullName,
+    });
+    this.projectForm.get('projectName')?.markAsDirty();
+    this.projectForm.get('projectName')?.markAsTouched();
+    this.memberDropdownOpen.set(false);
+  }
+
+  clearMember(event?: Event) {
+    event?.stopPropagation();
+    this.projectForm.patchValue({ projectName: '', clientName: '' });
+    this.memberDropdownOpen.set(false);
+  }
+
+  adjustSessionsCount(delta: number) {
+    const control = this.projectForm.get('sessionsCount');
+    const current = Number(control?.value ?? 0);
+    const next = Math.max(0, (Number.isFinite(current) ? current : 0) + delta);
+    control?.setValue(next);
+    control?.markAsDirty();
+    control?.markAsTouched();
+  }
+
   onEdit(id: number) {
     const project = this.projects().find((p) => p.projectId === id);
     if (!project) {
       return;
     }
+    this.memberDropdownOpen.set(false);
     this.showCreatePanel = false;
     this.editingProjectId = id;
     this.expandedProjectId = id;
     this.projectForm.patchValue({
       ...project,
       startDate: project.startDate ? project.startDate.substring(0, 10) : '',
+      endDate: project.endDate ? project.endDate.substring(0, 10) : '',
     });
   }
 
@@ -138,6 +207,7 @@ export class ProjectComponent implements OnInit {
 
   startCreate() {
     this.isSaving = false;
+    this.memberDropdownOpen.set(false);
     this.showCreatePanel = true;
     this.editingProjectId = null;
     this.expandedProjectId = null;
@@ -147,29 +217,37 @@ export class ProjectComponent implements OnInit {
       projectName: '',
       clientName: '',
       startDate: today,
+      endDate: '',
+      sessionsCount: null,
       leadByEmpId: null,
       contactPerson: '',
       contactNo: '',
+      contactNotes: '',
       emailId: '',
     });
   }
 
   closeCreatePanel() {
     this.isSaving = false;
+    this.memberDropdownOpen.set(false);
     this.showCreatePanel = false;
   }
 
   cancelEdit() {
     this.isSaving = false;
+    this.memberDropdownOpen.set(false);
     this.editingProjectId = null;
     this.projectForm.reset({
       projectId: null,
       projectName: '',
       clientName: '',
       startDate: '',
+      endDate: '',
+      sessionsCount: null,
       leadByEmpId: null,
       contactPerson: '',
       contactNo: '',
+      contactNotes: '',
       emailId: '',
     });
   }
@@ -189,9 +267,17 @@ export class ProjectComponent implements OnInit {
     if (this.isSaving) {
       return;
     }
+    const formValue = this.projectForm.value;
     const project: IProject = {
-      ...this.projectForm.value,
-      startDate: this.projectForm.value.startDate,
+      ...formValue,
+      clientName: formValue.clientName || formValue.projectName || '',
+      startDate: formValue.startDate,
+      endDate: formValue.endDate || undefined,
+      sessionsCount:
+        formValue.sessionsCount === null || formValue.sessionsCount === ''
+          ? undefined
+          : Number(formValue.sessionsCount),
+      contactNotes: formValue.contactNotes || undefined,
     };
     this.isSaving = true;
     if (project.projectId) {
