@@ -30,7 +30,7 @@ export class ApiConstants {
     MEMBERS_EXPORT: 'members/export-csv',
     MEMBERS_IMPORT: 'members/import',
     MEMBERS_PAYMENTS: (id: number) => `members/${id}/payments`,
-    MEMBERS_BARCODE: (id: number) => `members/${id}/barcode`,
+    MEMBERS_BARCODE: (id: number) => `members/barCode/${id}`,
 
     // Member subscription endpoints
     MEMBER_SUBSCRIPTIONS: 'member-subscriptions',

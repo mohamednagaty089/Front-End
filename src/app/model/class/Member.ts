@@ -5,7 +5,7 @@ export enum MemberType {
 }
 
 export class Member {
-  id: number;
+  id: number|undefined;
   phone: string;
   fullName: string;
   email: string;
@@ -21,7 +21,7 @@ export class Member {
     this.email = data?.email ?? '';
     this.memberType = data?.memberType ?? MemberType.Regular;
     this.address = data?.address ?? '';
-    this.id = data?.id ?? 0;
+    this.id = data?.id ?? undefined;
     this.nationalId = data?.nationalId ?? '';
     this.birthDate = data?.birthDate ?? new Date();
     this.barcodeId = data?.barcodeId ?? '';

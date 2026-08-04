@@ -1,6 +1,6 @@
 export interface AttendanceRecord {
   id: string;
-  memberId: number;
+  memberId: number|undefined;
   memberName: string;
   barcodeId: string;
   scannedAt: string;

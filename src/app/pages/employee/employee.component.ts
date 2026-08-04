@@ -335,6 +335,7 @@ export class EmployeeComponent implements OnInit {
       this.memberService.createMember(member).subscribe(
         (res) => {
           this.isSaving = false;
+          this.getMembers();
           const successBarcode = res?.data?.barcodeId ?? barcodeId;
           this.toast.success({
             title: 'تم الحفظ',
