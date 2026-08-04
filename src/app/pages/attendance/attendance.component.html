@@ -1,0 +1,164 @@
+<div class="attendance-page space-y-6 text-white/85" dir="rtl">
+  <section class="attendance-hero">
+    <div class="attendance-hero__copy">
+      <p class="attendance-kicker">مسح الحضور</p>
+      <h1 class="attendance-title">تسجيل الحضور بـ QR Code</h1>
+      <p class="attendance-subtitle">
+        وجّه الكاميرا نحو كود المشترك لتسجيل الحضور فوراً، أو أدخل الكود يدوياً عند الحاجة.
+      </p>
+    </div>
+    <div class="attendance-stats">
+      <div class="attendance-stat">
+        <span class="attendance-stat__label">حضور اليوم</span>
+        <span class="attendance-stat__value">{{ todayCount() }}</span>
+      </div>
+      <div class="attendance-stat">
+        <span class="attendance-stat__label">المشتركين</span>
+        <span class="attendance-stat__value">{{ members().length }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="attendance-grid">
+    <article
+      class="attendance-scanner"
+      [class.is-success]="flashState() === 'success'"
+      [class.is-warning]="flashState() === 'warning'"
+      [class.is-error]="flashState() === 'error'"
+    >
+      <header class="attendance-scanner__head">
+        <div>
+          <h2>ماسح QR</h2>
+          <p>استخدم كاميرا الجهاز لمسح كود المشترك</p>
+        </div>
+        <button
+          type="button"
+          ubButton
+          size="sm"
+          [disabled]="isStarting()"
+          class="attendance-scanner__toggle"
+          (click)="toggleScanner()"
+        >
+          <span *ngIf="isStarting()">جاري التشغيل...</span>
+          <span *ngIf="!isStarting() && !isScanning()">تشغيل الكاميرا</span>
+          <span *ngIf="!isStarting() && isScanning()">إيقاف الكاميرا</span>
+        </button>
+      </header>
+
+      <div class="attendance-scanner__stage">
+        <div
+          id="qr-attendance-reader"
+          class="attendance-scanner__viewport"
+          [class.is-live]="isScanning()"
+        ></div>
+
+        <div class="attendance-scanner__frame" *ngIf="isScanning()" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+          <div class="attendance-scanner__beam"></div>
+        </div>
+
+        <div class="attendance-scanner__idle" *ngIf="!isScanning() && !isStarting()">
+          <div class="attendance-scanner__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <path d="M4 8V5a1 1 0 0 1 1-1h3"></path>
+              <path d="M16 4h3a1 1 0 0 1 1 1v3"></path>
+              <path d="M20 16v3a1 1 0 0 1-1 1h-3"></path>
+              <path d="M8 20H5a1 1 0 0 1-1-1v-3"></path>
+              <rect x="8" y="8" width="8" height="8" rx="1.5"></rect>
+            </svg>
+          </div>
+          <p>اضغط تشغيل الكاميرا لبدء المسح</p>
+        </div>
+      </div>
+
+      <p class="attendance-scanner__error" *ngIf="cameraError()">
+        {{ cameraError() }}
+      </p>
+
+      <div class="attendance-manual">
+        <label for="manual-code">إدخال يدوي للكود</label>
+        <div class="attendance-manual__row">
+          <input
+            id="manual-code"
+            type="text"
+            [(ngModel)]="manualCode"
+            (keyup.enter)="submitManualCode()"
+            placeholder="ألصق أو اكتب كود الـ QR / الباركود"
+            class="attendance-manual__input"
+          />
+          <button
+            type="button"
+            ubButton
+            size="sm"
+            class="attendance-manual__btn"
+            (click)="submitManualCode()"
+          >
+            تسجيل
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <aside class="attendance-side">
+      <article
+        class="attendance-result"
+        *ngIf="lastResult() as result; else emptyResult"
+        [class.is-duplicate]="result.status === 'duplicate'"
+      >
+        <p class="attendance-result__label">
+          {{ result.status === 'present' ? 'تم التسجيل' : 'مسجل مسبقاً' }}
+        </p>
+        <h3>{{ result.memberName }}</h3>
+        <p class="attendance-result__meta">{{ result.barcodeId }}</p>
+        <p class="attendance-result__time">{{ formattedTime(result.scannedAt) }}</p>
+      </article>
+      <ng-template #emptyResult>
+        <article class="attendance-result is-empty">
+          <p class="attendance-result__label">آخر مسح</p>
+          <h3>بانتظار أول كود</h3>
+          <p class="attendance-result__meta">سيظهر هنا اسم المشترك فور المسح</p>
+        </article>
+      </ng-template>
+
+      <article class="attendance-log">
+        <header class="attendance-log__head">
+          <div>
+            <h2>سجل الحضور</h2>
+            <p>اليوم · {{ todayCount() }} حضور</p>
+          </div>
+          <button
+            type="button"
+            class="attendance-log__clear"
+            (click)="clearLog()"
+            [disabled]="!attendanceLog().length"
+          >
+            مسح السجل
+          </button>
+        </header>
+
+        <ul class="attendance-log__list" *ngIf="attendanceLog().length; else emptyLog">
+          <li
+            *ngFor="let item of attendanceLog()"
+            class="attendance-log__item"
+            [class.is-duplicate]="item.status === 'duplicate'"
+          >
+            <div class="attendance-log__avatar" aria-hidden="true">
+              {{ item.memberName?.charAt(0) || 'م' }}
+            </div>
+            <div class="attendance-log__body">
+              <strong>{{ item.memberName }}</strong>
+              <span>{{ item.barcodeId }}</span>
+            </div>
+            <div class="attendance-log__time">
+              <span>{{ formattedTime(item.scannedAt) }}</span>
+              <em>{{ item.status === 'present' ? 'حاضر' : 'مكرر' }}</em>
+            </div>
+          </li>
+        </ul>
+        <ng-template #emptyLog>
+          <div class="attendance-log__empty">لا يوجد حضور مسجل بعد.</div>
+        </ng-template>
+      </article>
+    </aside>
+  </section>
+</div>

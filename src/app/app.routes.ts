@@ -10,6 +10,7 @@ import { BusinessInsightsComponent } from './pages/business-insights/business-in
 import { CalendarTimelineComponent } from './pages/calendar-timeline/calendar-timeline.component';
 import { ApiDocComponent } from './pages/api-doc/api-doc.component';
 import { ApiStatusComponent } from './pages/api-status/api-status.component';
+import { AttendanceComponent } from './pages/attendance/attendance.component';
 
 export const routes: Routes = [
   {
@@ -51,6 +52,14 @@ export const routes: Routes = [
         data: {
           layout: 'private',
           pageTitle: 'Projects',
+        },
+      },
+      {
+        path: 'attendance',
+        component: AttendanceComponent,
+        data: {
+          layout: 'private',
+          pageTitle: 'Attendance',
         },
       },
       {
