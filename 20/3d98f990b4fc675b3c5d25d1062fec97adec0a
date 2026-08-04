@@ -1,0 +1,39 @@
+src/app/model/class/MemberSubscription.ts
+  s_941acfe98e913a::t_836fb72bdbb3e0 1-19
+src/app/pages/project/project.component.ts
+  s_941acfe98e913a::t_08fe70b3e5fcaa 19,64,68-72,76,79-83
+  s_941acfe98e913a::t_8b0cc564958575 125-127,129-132,138,143,160-170,173-174
+  s_941acfe98e913a::t_d1ded89d1b9a7d 231-234,238,252-255,259,267-283,285-286,288-289,296-297,299-320,322-323,327-328,333,336-337,339-340
+src/app/pages/project/project.component.html
+  s_941acfe98e913a::t_4c6d9f67feb88f 261,549
+  s_941acfe98e913a::t_4d31bf0162fd38 275,563
+src/app/Common/ApiConstants.ts
+  s_941acfe98e913a::t_fc11712231efb3 33-39
+src/app/service/genericService.ts
+  h_63a91c69e5d960 65,73
+src/app/service/memberService.ts
+  h_63a91c69e5d960 42,50
+  s_941acfe98e913a::t_f30c3d5fdb96a6 11,53
+  s_941acfe98e913a::t_6a18c36bbc2852 8,38-41,43,45-49,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "203d98f990b4fc675b3c5d25d1062fec97adec0a",
+  "prompts": {},
+  "humans": {
+    "h_63a91c69e5d960": {
+      "author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  },
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
