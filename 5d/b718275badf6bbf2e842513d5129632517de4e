@@ -1,0 +1,36 @@
+src/app/app.routes.ts
+  s_941acfe98e913a::t_2ce2cc5cb3e2d6 67-73
+  s_941acfe98e913a::t_98eb0cd2fb7b08 14
+  s_941acfe98e913a::t_fba8a614afe5b9 66
+src/app/pages/layout/layout.component.html
+  s_941acfe98e913a::t_eebea277e5a2bb 39-44
+  s_941acfe98e913a::t_a19cf5b1d80dad 38
+src/app/Common/ApiConstants.ts
+  s_941acfe98e913a::t_05e3afde2e3b99 33
+src/app/pages/barcode-generator/barcode-generator.component.html
+  s_941acfe98e913a::t_8f25429786a9d4 1-174
+src/app/pages/barcode-generator/barcode-generator.component.ts
+  s_941acfe98e913a::t_40f6bcbb0cee9a 121,123-136
+  s_941acfe98e913a::t_8aa96ced84a47a 1-120,122,137-186
+src/app/service/memberService.ts
+  s_941acfe98e913a::t_b771b7908b0c8b 39-43,45
+  s_941acfe98e913a::t_4649c7b4165a5b 38,44,46-47
+src/app/pages/barcode-generator/barcode-generator.component.css
+  s_941acfe98e913a::t_503fcb3d019c42 1-405
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "5db718275badf6bbf2e842513d5129632517de4e",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
