@@ -16,6 +16,7 @@ import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
 import { MemberService } from '../../service/memberService';
 import { Member } from '../../model/class/Member';
+import { MemberSubscription } from '../../model/class/MemberSubscription';
 import { DatePipe, CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '@/app/components/ui/toast.service';
@@ -60,23 +61,25 @@ export class ProjectComponent implements OnInit {
   });
 
   get selectedMemberLabel(): string {
-    const value = this.projectForm.get('projectName')?.value;
+    const value = this.subscriptionForm.get('memberName')?.value;
     return value ? String(value) : '';
   }
 
-  projectForm: FormGroup = this.fb.group({
-    projectId: [null],
-    projectName: ['', Validators.required],
-    clientName: [''],
+  /** Form group for member subscription renewal */
+  subscriptionForm: FormGroup = this.fb.group({
+    id: [null],
+    memberId: [null, Validators.required],
+    memberName: ['', Validators.required],
     startDate: ['', Validators.required],
     endDate: [''],
     sessionsCount: [null],
-    leadByEmpId: [null],
-    contactPerson: [''],
-    contactNo: [''],
-    contactNotes: [''],
-    emailId: [''],
+    notes: [''],
   });
+
+  /** Keep alias so existing template bindings to projectForm still work during rename */
+  get projectForm(): FormGroup {
+    return this.subscriptionForm;
+  }
 
   expandedProjectId: number | null = null;
   editingProjectId: number | null = null;
@@ -119,23 +122,25 @@ export class ProjectComponent implements OnInit {
   }
 
   selectMember(member: Member) {
-    this.projectForm.patchValue({
-      projectName: member.fullName,
-      clientName: member.fullName,
+    this.subscriptionForm.patchValue({
+      memberId: member.id,
+      memberName: member.fullName,
     });
-    this.projectForm.get('projectName')?.markAsDirty();
-    this.projectForm.get('projectName')?.markAsTouched();
+    this.subscriptionForm.get('memberId')?.markAsDirty();
+    this.subscriptionForm.get('memberId')?.markAsTouched();
+    this.subscriptionForm.get('memberName')?.markAsDirty();
+    this.subscriptionForm.get('memberName')?.markAsTouched();
     this.memberDropdownOpen.set(false);
   }
 
   clearMember(event?: Event) {
     event?.stopPropagation();
-    this.projectForm.patchValue({ projectName: '', clientName: '' });
+    this.subscriptionForm.patchValue({ memberId: null, memberName: '' });
     this.memberDropdownOpen.set(false);
   }
 
   adjustSessionsCount(delta: number) {
-    const control = this.projectForm.get('sessionsCount');
+    const control = this.subscriptionForm.get('sessionsCount');
     const current = Number(control?.value ?? 0);
     const next = Math.max(0, (Number.isFinite(current) ? current : 0) + delta);
     control?.setValue(next);
@@ -152,10 +157,21 @@ export class ProjectComponent implements OnInit {
     this.showCreatePanel = false;
     this.editingProjectId = id;
     this.expandedProjectId = id;
-    this.projectForm.patchValue({
-      ...project,
+
+    const matchedMember = this.members().find(
+      (member) =>
+        member.fullName === project.projectName ||
+        member.fullName === project.clientName
+    );
+
+    this.subscriptionForm.patchValue({
+      id: project.projectId ?? null,
+      memberId: matchedMember?.id ?? null,
+      memberName: project.projectName || project.clientName || '',
       startDate: project.startDate ? project.startDate.substring(0, 10) : '',
       endDate: project.endDate ? project.endDate.substring(0, 10) : '',
+      sessionsCount: project.sessionsCount ?? null,
+      notes: project.contactNotes ?? '',
     });
   }
 
@@ -212,18 +228,14 @@ export class ProjectComponent implements OnInit {
     this.editingProjectId = null;
     this.expandedProjectId = null;
     const today = new Date().toISOString().substring(0, 10);
-    this.projectForm.reset({
-      projectId: null,
-      projectName: '',
-      clientName: '',
+    this.subscriptionForm.reset({
+      id: null,
+      memberId: null,
+      memberName: '',
       startDate: today,
       endDate: '',
       sessionsCount: null,
-      leadByEmpId: null,
-      contactPerson: '',
-      contactNo: '',
-      contactNotes: '',
-      emailId: '',
+      notes: '',
     });
   }
 
@@ -237,18 +249,14 @@ export class ProjectComponent implements OnInit {
     this.isSaving = false;
     this.memberDropdownOpen.set(false);
     this.editingProjectId = null;
-    this.projectForm.reset({
-      projectId: null,
-      projectName: '',
-      clientName: '',
+    this.subscriptionForm.reset({
+      id: null,
+      memberId: null,
+      memberName: '',
       startDate: '',
       endDate: '',
       sessionsCount: null,
-      leadByEmpId: null,
-      contactPerson: '',
-      contactNo: '',
-      contactNotes: '',
-      emailId: '',
+      notes: '',
     });
   }
 
@@ -256,69 +264,80 @@ export class ProjectComponent implements OnInit {
     this.searchTerm.set(term);
   }
 
+  /** Build MemberSubscription from the subscription form group */
+  private buildMemberSubscription(): MemberSubscription {
+    const formValue = this.subscriptionForm.getRawValue();
+    return new MemberSubscription({
+      id: formValue.id ?? 0,
+      memberId: Number(formValue.memberId),
+      memberName: formValue.memberName ?? '',
+      startDate: formValue.startDate ?? '',
+      endDate: formValue.endDate ?? '',
+      sessionsCount:
+        formValue.sessionsCount === null || formValue.sessionsCount === ''
+          ? null
+          : Number(formValue.sessionsCount),
+      notes: formValue.notes ?? '',
+    });
+  }
+
   onSave() {
-    if (this.projectForm.invalid) {
+    if (this.subscriptionForm.invalid) {
+      this.subscriptionForm.markAllAsTouched();
       this.toast.error({
-        title: 'Incomplete details',
-        description: 'Please fill all required fields before saving.',
+        title: 'بيانات غير مكتملة',
+        description: 'يرجى تعبئة الحقول المطلوبة قبل الحفظ.',
       });
       return;
     }
     if (this.isSaving) {
       return;
     }
-    const formValue = this.projectForm.value;
-    const project: IProject = {
-      ...formValue,
-      clientName: formValue.clientName || formValue.projectName || '',
-      startDate: formValue.startDate,
-      endDate: formValue.endDate || undefined,
-      sessionsCount:
-        formValue.sessionsCount === null || formValue.sessionsCount === ''
-          ? undefined
-          : Number(formValue.sessionsCount),
-      contactNotes: formValue.contactNotes || undefined,
-    };
+
+    const subscription = this.buildMemberSubscription();
     this.isSaving = true;
-    if (project.projectId) {
-      this.masterSrv.updateProject(project).subscribe(
-        () => {
-          this.isSaving = false;
-          this.getProjects();
-          this.toast.success({
-            title: 'Project updated',
-            description: 'Changes have been saved successfully.',
-          });
-          this.cancelEdit();
-        },
-        () => {
-          this.isSaving = false;
-          this.toast.error({
-            title: 'Update failed',
-            description: 'Unable to update the project right now.',
-          });
-        }
-      );
+
+    if (subscription.id) {
+      this.memberService
+        .updateMemberSubscription(subscription.id, subscription)
+        .subscribe({
+          next: () => {
+            this.isSaving = false;
+            this.getProjects();
+            this.toast.success({
+              title: 'تم التحديث',
+              description: 'تم حفظ تعديلات الاشتراك بنجاح.',
+            });
+            this.cancelEdit();
+          },
+          error: () => {
+            this.isSaving = false;
+            this.toast.error({
+              title: 'فشل التحديث',
+              description: 'تعذر تحديث الاشتراك حالياً.',
+            });
+          },
+        });
     } else {
-      this.masterSrv.saveProject(project as any).subscribe(
-        () => {
+      this.memberService.createMemberSubscription(subscription).subscribe({
+        next: () => {
           this.isSaving = false;
           this.getProjects();
           this.toast.success({
-            title: 'Project created',
-            description: 'A new project is now tracked in the system.',
+            title: 'تم الحفظ',
+            description: 'تم تجديد الاشتراك بنجاح.',
           });
           this.showCreatePanel = false;
           this.cancelEdit();
         },
-        () => {
+        error: () => {
           this.isSaving = false;
           this.toast.error({
-            title: 'Creation failed',
-            description: 'Unable to create project right now.',
+            title: 'فشل الحفظ',
+            description: 'تعذر حفظ الاشتراك حالياً.',
           });
-        }
-      );
+        },
+      });
     }
   }
 

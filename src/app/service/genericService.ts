@@ -62,7 +62,7 @@ export class GenericService<T> {
   }
 
   // CREATE
-  create(endpoint: string, item: T): Observable<ApiResponse<T>> {
+  create<T>(endpoint: string, item: T): Observable<ApiResponse<T>> {
     return this.http.post<ApiResponse<T>>(this.getUrl(endpoint), item)
       .pipe(
         catchError(this.handleError)
@@ -70,7 +70,7 @@ export class GenericService<T> {
   }
 
   // UPDATE
-  update(endpoint: string, id: number | string, item: T): Observable<ApiResponse<T>> {
+  update<T>(endpoint: string, id: number | string, item: T): Observable<ApiResponse<T>> {
     return this.http.put<ApiResponse<T>>(`${this.getUrl(endpoint)}/${id}`, item)
       .pipe(
         catchError(this.handleError)

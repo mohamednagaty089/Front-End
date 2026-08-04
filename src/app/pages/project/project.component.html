@@ -258,7 +258,7 @@
         >
         <div
           class="notes-field"
-          [class.has-value]="!!projectForm.get('contactNotes')?.value"
+          [class.has-value]="!!projectForm.get('notes')?.value"
         >
           <span class="notes-field__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -272,7 +272,7 @@
             <textarea
               id="notes"
               rows="3"
-              formControlName="contactNotes"
+              formControlName="notes"
               class="notes-field__input"
               placeholder="اكتب الملاحظات هنا..."
             ></textarea>
@@ -546,7 +546,7 @@
               >
               <div
                 class="notes-field"
-                [class.has-value]="!!projectForm.get('contactNotes')?.value"
+                [class.has-value]="!!projectForm.get('notes')?.value"
               >
                 <span class="notes-field__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -560,7 +560,7 @@
                   <textarea
                     [id]="'edit-notes-' + project.projectId"
                     rows="3"
-                    formControlName="contactNotes"
+                    formControlName="notes"
                     class="notes-field__input"
                     placeholder="اكتب الملاحظات هنا..."
                   ></textarea>
