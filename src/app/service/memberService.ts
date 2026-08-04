@@ -35,6 +35,16 @@ export class MemberService extends GenericService<Member> {
     return this.delete<boolean>(endpoint, id);
   }
 
+  /** Fetch member barcode image as base64 from backend */
+  getMemberBarcode(
+    memberId: number
+  ): Observable<
+    ApiResponse<string | { base64?: string; imageBase64?: string; data?: string }>
+  > {
+    const endpoint = ApiConstants.ENDPOINTS.MEMBERS_BARCODE(memberId);
+    return this.get(endpoint);
+  }
+
   getAllMemberSubscriptions(): Observable<ApiResponse<MemberSubscription[]>> {
     const endpoint = `${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS}/${ApiConstants.ENDPOINTS.MEMBER_SUBSCRIPTIONS_GET_ALL}`;
     return this.get<MemberSubscription[]>(endpoint);

@@ -1,0 +1,405 @@
+:host {
+  display: block;
+}
+
+.barcode-page {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.barcode-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.18), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.14), transparent 40%),
+    rgba(255, 255, 255, 0.04);
+  padding: 1.4rem 1.5rem;
+  box-shadow: 0 28px 70px rgba(8, 15, 35, 0.35);
+}
+
+.barcode-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.barcode-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  font-weight: 700;
+  color: white;
+}
+
+.barcode-subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 34rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.barcode-stat {
+  min-width: 6.5rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+
+.barcode-stat__label {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.barcode-stat__value {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+}
+
+.barcode-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .barcode-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.barcode-panel,
+.barcode-preview {
+  border-radius: 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 24px 60px rgba(8, 15, 35, 0.3);
+  padding: 1.2rem;
+}
+
+.barcode-panel__head,
+.barcode-preview__head {
+  margin-bottom: 1rem;
+}
+
+.barcode-panel__head h2,
+.barcode-preview__head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: white;
+}
+
+.barcode-panel__head p,
+.barcode-preview__head p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.barcode-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.barcode-dropdown {
+  z-index: 1;
+  direction: rtl;
+}
+
+.barcode-dropdown.is-open {
+  z-index: 30;
+}
+
+.barcode-dropdown__shell {
+  position: relative;
+}
+
+.barcode-dropdown__trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(14, 165, 233, 0.08)),
+    rgba(255, 255, 255, 0.04);
+  padding: 0.7rem 1rem 0.7rem 0.9rem;
+  text-align: start;
+  color: rgba(255, 255, 255, 0.72);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.barcode-dropdown__trigger:hover,
+.barcode-dropdown.is-open .barcode-dropdown__trigger {
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.barcode-dropdown__trigger.has-value {
+  color: rgba(255, 255, 255, 0.95);
+  padding-inline-end: 3.4rem;
+}
+
+.barcode-dropdown__avatar,
+.barcode-dropdown__option-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #6366f1, #0ea5e9);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+}
+
+.barcode-dropdown__text,
+.barcode-dropdown__option-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.barcode-dropdown__value,
+.barcode-dropdown__option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.barcode-dropdown__hint,
+.barcode-dropdown__option-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  direction: ltr;
+  text-align: right;
+}
+
+.barcode-dropdown__clear {
+  position: absolute;
+  inset-inline-end: 2.1rem;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.barcode-dropdown__clear:hover {
+  background: rgba(244, 63, 94, 0.25);
+  color: #fda4af;
+}
+
+.barcode-dropdown__chevron {
+  margin-inline-start: auto;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.55);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+.barcode-dropdown.is-open .barcode-dropdown__chevron {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.barcode-dropdown__panel {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.45rem);
+  max-height: 16rem;
+  overflow: auto;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(20, 28, 52, 0.98), rgba(12, 18, 36, 0.98));
+  box-shadow: 0 28px 60px rgba(3, 8, 22, 0.65);
+}
+
+.barcode-dropdown__search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.7rem 0.75rem 0.45rem;
+  background: rgba(12, 18, 36, 0.95);
+}
+
+.barcode-dropdown__search input {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.55rem 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  outline: none;
+}
+
+.barcode-dropdown__option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.9rem;
+  text-align: start;
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 0.15s ease;
+}
+
+.barcode-dropdown__option:hover,
+.barcode-dropdown__option.is-selected {
+  background: rgba(99, 102, 241, 0.16);
+}
+
+.barcode-dropdown__option-avatar {
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.barcode-dropdown__option.is-selected .barcode-dropdown__option-avatar {
+  background: linear-gradient(145deg, #6366f1, #0ea5e9);
+}
+
+.barcode-dropdown__check {
+  color: #a5b4fc;
+}
+
+.barcode-dropdown__empty {
+  padding: 1.1rem 0.9rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.barcode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.barcode-actions__generate {
+  background: linear-gradient(135deg, #6366f1, #0ea5e9);
+  color: white;
+  box-shadow: 0 16px 35px rgba(99, 102, 241, 0.3);
+}
+
+.barcode-actions__download {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.barcode-preview.has-image {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.1),
+    0 24px 60px rgba(8, 15, 35, 0.3);
+}
+
+.barcode-preview__stage {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  border-radius: 1.2rem;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  padding: 1.25rem;
+}
+
+.barcode-preview__image {
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0.75rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+.barcode-preview__empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.barcode-preview__icon {
+  display: grid;
+  place-items: center;
+  width: 3.8rem;
+  height: 3.8rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.25), rgba(14, 165, 233, 0.2));
+  color: #a5b4fc;
+}
+
+.barcode-preview__icon svg {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.barcode-preview__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.barcode-preview__meta > div {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 0.85rem;
+}
+
+.barcode-preview__meta span {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.barcode-preview__meta strong {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+  color: white;
+  direction: ltr;
+  text-align: right;
+  word-break: break-all;
+}

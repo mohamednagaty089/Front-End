@@ -11,6 +11,7 @@ import { CalendarTimelineComponent } from './pages/calendar-timeline/calendar-ti
 import { ApiDocComponent } from './pages/api-doc/api-doc.component';
 import { ApiStatusComponent } from './pages/api-status/api-status.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
+import { BarcodeGeneratorComponent } from './pages/barcode-generator/barcode-generator.component';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,14 @@ export const routes: Routes = [
         data: {
           layout: 'private',
           pageTitle: 'Attendance',
+        },
+      },
+      {
+        path: 'barcode',
+        component: BarcodeGeneratorComponent,
+        data: {
+          layout: 'private',
+          pageTitle: 'Barcode Generator',
         },
       },
       {

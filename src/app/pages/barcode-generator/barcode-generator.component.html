@@ -1,0 +1,174 @@
+<div class="barcode-page space-y-6" dir="rtl">
+  <section class="barcode-hero">
+    <div>
+      <p class="barcode-kicker">توليد الباركود</p>
+      <h1 class="barcode-title">إنشاء باركود المشترك</h1>
+      <p class="barcode-subtitle">
+        اختر المشترك ثم اجلب صورة الباركود من الخادم كـ Base64 وحمّلها كصورة.
+      </p>
+    </div>
+    <div class="barcode-stat">
+      <span class="barcode-stat__label">المشتركين</span>
+      <span class="barcode-stat__value">{{ members().length }}</span>
+    </div>
+  </section>
+
+  <section class="barcode-grid">
+    <article class="barcode-panel">
+      <header class="barcode-panel__head">
+        <div>
+          <h2>اختيار المشترك</h2>
+          <p>حدد المشترك لتوليد الباركود الخاص به</p>
+        </div>
+      </header>
+
+      <label class="barcode-label" for="barcode-member">اسم المشترك</label>
+      <div class="barcode-dropdown relative" [class.is-open]="memberDropdownOpen()">
+        <div class="barcode-dropdown__shell">
+          <button
+            id="barcode-member"
+            type="button"
+            class="barcode-dropdown__trigger"
+            [class.has-value]="!!selectedMember()"
+            (click)="toggleMemberDropdown($event)"
+            [attr.aria-expanded]="memberDropdownOpen()"
+            aria-haspopup="listbox"
+          >
+            <span class="barcode-dropdown__avatar" aria-hidden="true">
+              {{ selectedMember()?.fullName?.charAt(0) || 'م' }}
+            </span>
+            <span class="barcode-dropdown__text">
+              <span class="barcode-dropdown__value">
+                {{ selectedMember()?.fullName || 'اختر المشترك' }}
+              </span>
+              <span class="barcode-dropdown__hint" *ngIf="!selectedMember()">
+                من قائمة المشتركين
+              </span>
+              <span class="barcode-dropdown__hint" *ngIf="selectedMember()?.barcodeId">
+                {{ selectedMember()?.barcodeId }}
+              </span>
+            </span>
+            <span class="barcode-dropdown__chevron" aria-hidden="true"></span>
+          </button>
+          <button
+            *ngIf="selectedMember()"
+            type="button"
+            class="barcode-dropdown__clear"
+            (click)="clearMember($event)"
+            aria-label="مسح الاختيار"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="barcode-dropdown__panel" role="listbox" *ngIf="memberDropdownOpen()">
+          <div class="barcode-dropdown__search">
+            <input
+              type="search"
+              placeholder="ابحث بالاسم أو الهاتف أو الكود…"
+              [value]="searchTerm()"
+              (input)="updateSearch($any($event.target).value)"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+          <button
+            type="button"
+            class="barcode-dropdown__option"
+            *ngFor="let member of filteredMembers()"
+            role="option"
+            [attr.aria-selected]="selectedMember()?.id === member.id"
+            [class.is-selected]="selectedMember()?.id === member.id"
+            (click)="selectMember(member)"
+          >
+            <span class="barcode-dropdown__option-avatar" aria-hidden="true">
+              {{ member.fullName?.charAt(0) || 'م' }}
+            </span>
+            <span class="barcode-dropdown__option-body">
+              <span class="barcode-dropdown__option-name">{{ member.fullName }}</span>
+              <span class="barcode-dropdown__option-meta">
+                {{ member.barcodeId || member.phone || '—' }}
+              </span>
+            </span>
+            <span
+              class="barcode-dropdown__check"
+              *ngIf="selectedMember()?.id === member.id"
+              aria-hidden="true"
+              >✓</span
+            >
+          </button>
+          <div class="barcode-dropdown__empty" *ngIf="!filteredMembers().length">
+            لا يوجد مشتركين مطابقين
+          </div>
+        </div>
+      </div>
+
+      <div class="barcode-actions">
+        <button
+          type="button"
+          ubButton
+          size="sm"
+          class="barcode-actions__generate"
+          [disabled]="isLoading() || !selectedMember()"
+          (click)="generateBarcode()"
+        >
+          <span *ngIf="!isLoading()">توليد الباركود</span>
+          <span *ngIf="isLoading()">جاري الجلب...</span>
+        </button>
+        <button
+          type="button"
+          ubButton
+          size="sm"
+          variant="outline"
+          class="barcode-actions__download"
+          [disabled]="!barcodeImageSrc()"
+          (click)="downloadBarcode()"
+        >
+          تحميل الصورة
+        </button>
+      </div>
+    </article>
+
+    <article class="barcode-preview" [class.has-image]="!!barcodeImageSrc()">
+      <header class="barcode-preview__head">
+        <div>
+          <h2>معاينة الباركود</h2>
+          <p *ngIf="selectedMember() as member">{{ member.fullName }}</p>
+          <p *ngIf="!selectedMember()">اختر مشتركاً ثم اضغط توليد</p>
+        </div>
+      </header>
+
+      <div class="barcode-preview__stage">
+        <img
+          *ngIf="barcodeImageSrc() as src"
+          [src]="src"
+          [alt]="'باركود ' + (selectedMember()?.fullName || '')"
+          class="barcode-preview__image"
+        />
+        <div class="barcode-preview__empty" *ngIf="!barcodeImageSrc()">
+          <div class="barcode-preview__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <path d="M4 6v12"></path>
+              <path d="M7 7v10"></path>
+              <path d="M10 6v12"></path>
+              <path d="M13 8v8"></path>
+              <path d="M16 6v12"></path>
+              <path d="M19 7v10"></path>
+            </svg>
+          </div>
+          <p>ستظهر صورة الباركود هنا بعد الجلب من الخادم</p>
+        </div>
+      </div>
+
+      <div class="barcode-preview__meta" *ngIf="selectedMember() as member">
+        <div>
+          <span>كود الباركود</span>
+          <strong>{{ member.barcodeId || '—' }}</strong>
+        </div>
+        <div>
+          <span>رقم المشترك</span>
+          <strong>{{ member.id }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>
