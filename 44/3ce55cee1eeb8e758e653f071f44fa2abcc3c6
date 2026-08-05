@@ -1,0 +1,42 @@
+src/app/model/class/MemberSubscription.ts
+  s_941acfe98e913a::t_6a85464d6efbb9 1-15,23-24,35-36
+  s_941acfe98e913a::t_2e1553276d1634 25,37
+src/app/pages/project/project.component.html
+  s_941acfe98e913a::t_0e1d5aeb346834 296-321
+  s_941acfe98e913a::t_9df005c2f6ab07 243-286,322-323,664-665
+  s_941acfe98e913a::t_844f49175716d0 612-663
+  s_941acfe98e913a::t_e82ebf879f9921 781-792
+  s_941acfe98e913a::t_9d0a6df8e1ee1e 793-798
+  s_941acfe98e913a::t_81ca998d0f01cd 666-702
+  s_941acfe98e913a::t_a0c13997d0f12f 287-289,293-295
+src/app/pages/project/project.component.css
+  s_941acfe98e913a::t_5beac33a199c87 670-813
+  s_941acfe98e913a::t_9e94828bbb09ce 575-669,814
+src/app/pages/project/project.component.ts
+  s_941acfe98e913a::t_2f50886a3cde50 393-408
+  s_941acfe98e913a::t_7b146f8ac6e2cf 270-271,294-295
+  s_941acfe98e913a::t_42545b06841692 272,296
+  s_941acfe98e913a::t_b3017c2ae3e596 95
+  s_941acfe98e913a::t_b950cc1428a6e1 17-21,48-62,74-75,93-94
+  s_941acfe98e913a::t_d485d1b306f1e7 201
+  s_941acfe98e913a::t_8938ec7526b397 317-318
+  s_941acfe98e913a::t_02360f88a56469 199-200
+  s_941acfe98e913a::t_df6cf8789b9ca7 319-322
+  s_941acfe98e913a::t_6bfe22ad46796e 409-415
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "443ce55cee1eeb8e758e653f071f44fa2abcc3c6",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
