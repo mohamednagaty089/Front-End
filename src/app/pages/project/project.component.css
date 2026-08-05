@@ -572,6 +572,246 @@
   font-weight: 400;
 }
 
+.choice-field {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  direction: rtl;
+}
+
+.choice-field--payment {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .choice-field--payment {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.choice-field__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  padding: 0.7rem 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease;
+}
+
+.choice-field__option:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  background:
+    linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08));
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.choice-field__option.is-selected {
+  border-color: rgba(56, 189, 248, 0.55);
+  background:
+    linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.14));
+  color: white;
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.12),
+    0 12px 28px rgba(8, 15, 35, 0.35);
+}
+
+.choice-field--payment .choice-field__option.is-selected {
+  border-color: rgba(52, 211, 153, 0.55);
+  background:
+    linear-gradient(135deg, rgba(52, 211, 153, 0.18), rgba(14, 165, 233, 0.12));
+  box-shadow:
+    0 0 0 3px rgba(52, 211, 153, 0.12),
+    0 12px 28px rgba(8, 15, 35, 0.35);
+}
+
+.choice-field__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-field__dot {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.choice-field__option.is-selected .choice-field__dot {
+  border-color: #7dd3fc;
+  background: #38bdf8;
+  box-shadow: inset 0 0 0 3px rgba(15, 23, 42, 0.85);
+}
+
+.choice-field--payment .choice-field__option.is-selected .choice-field__dot {
+  border-color: #6ee7b7;
+  background: #34d399;
+}
+
+.choice-field__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.amount-field {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  direction: rtl;
+  text-align: right;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(14, 165, 233, 0.08)),
+    rgba(255, 255, 255, 0.04);
+  padding: 0.85rem 1rem;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.amount-field__glow {
+  pointer-events: none;
+  position: absolute;
+  inset-inline-start: -20%;
+  top: -40%;
+  width: 55%;
+  height: 140%;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.22), transparent 70%);
+  opacity: 0.7;
+}
+
+.amount-field:hover {
+  border-color: rgba(52, 211, 153, 0.4);
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(14, 165, 233, 0.12)),
+    rgba(255, 255, 255, 0.05);
+}
+
+.amount-field:focus-within {
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow:
+    0 0 0 3px rgba(52, 211, 153, 0.15),
+    0 18px 40px rgba(8, 15, 35, 0.45);
+  transform: translateY(-1px);
+}
+
+.amount-field.has-value {
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+.amount-field__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #34d399, #0ea5e9);
+  color: white;
+  box-shadow: 0 10px 24px rgba(52, 211, 153, 0.35);
+}
+
+.amount-field__icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.amount-field__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.amount-field__hint {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgba(167, 243, 208, 0.7);
+}
+
+.amount-field__input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.amount-field__input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  outline: none;
+  direction: ltr;
+  text-align: right;
+  -moz-appearance: textfield;
+}
+
+.amount-field__input::-webkit-outer-spin-button,
+.amount-field__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.amount-field__input::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 600;
+}
+
+.amount-field__currency {
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: rgba(16, 185, 129, 0.18);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a7f3d0;
+}
+
+.amount-field__preview {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(6, 78, 59, 0.35);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #d1fae5;
+  white-space: nowrap;
+}
+
+
+
 
 
 
