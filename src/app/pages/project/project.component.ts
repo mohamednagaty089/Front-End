@@ -14,7 +14,11 @@ import {
 } from '@angular/forms';
 import { MemberService } from '../../service/memberService';
 import { Member } from '../../model/class/Member';
-import { MemberSubscription } from '../../model/class/MemberSubscription';
+import {
+  MemberSubscription,
+  PaymentMethod,
+  SubscriptionStatus,
+} from '../../model/class/MemberSubscription';
 import { DatePipe, CommonModule } from '@angular/common';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
@@ -41,6 +45,21 @@ export class ProjectComponent implements OnInit {
   readonly searchTerm = signal<string>('');
   readonly memberDropdownOpen = signal(false);
 
+  readonly subscriptionStatuses = [
+    { value: SubscriptionStatus.Active, label: 'نشط' },
+    { value: SubscriptionStatus.Pending, label: 'قيد الانتظار' },
+    { value: SubscriptionStatus.Expired, label: 'منتهي' },
+    { value: SubscriptionStatus.Suspended, label: 'موقوف' },
+  ];
+
+  readonly paymentMethods = [
+    { value: PaymentMethod.Cash, label: 'كاش' },
+    { value: PaymentMethod.InstaPay, label: 'إنستا باي' },
+    { value: PaymentMethod.Visa, label: 'فيزا' },
+    { value: PaymentMethod.VodafoneCash, label: 'فودافون كاش' },
+    { value: PaymentMethod.BankTransfer, label: 'تحويل بنكي' },
+  ];
+
   readonly filteredSubscriptions = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
@@ -52,6 +71,8 @@ export class ProjectComponent implements OnInit {
         subscription.startDate?.toLowerCase().includes(term) ||
         subscription.endDate?.toLowerCase().includes(term) ||
         subscription.notes?.toLowerCase().includes(term) ||
+        subscription.status?.toLowerCase().includes(term) ||
+        subscription.paymentMethod?.toLowerCase().includes(term) ||
         String(subscription.sessionsCount ?? '').includes(term)
       );
     });
@@ -69,6 +90,9 @@ export class ProjectComponent implements OnInit {
     startDate: ['', Validators.required],
     endDate: [''],
     sessionsCount: [null],
+    status: [SubscriptionStatus.Active, Validators.required],
+    paymentMethod: [PaymentMethod.Cash, Validators.required],
+    amount: [null],
     notes: [''],
   });
 
@@ -172,6 +196,9 @@ export class ProjectComponent implements OnInit {
         ? String(subscription.endDate).substring(0, 10)
         : '',
       sessionsCount: subscription.sessionsCount ?? null,
+      status: subscription.status ?? SubscriptionStatus.Active,
+      paymentMethod: subscription.paymentMethod ?? PaymentMethod.Cash,
+      amount: subscription.amount ?? null,
       notes: subscription.notes ?? '',
     });
   }
@@ -240,6 +267,9 @@ export class ProjectComponent implements OnInit {
       startDate: today,
       endDate: '',
       sessionsCount: null,
+      status: SubscriptionStatus.Active,
+      paymentMethod: PaymentMethod.Cash,
+      amount: null,
       notes: '',
     });
   }
@@ -261,6 +291,9 @@ export class ProjectComponent implements OnInit {
       startDate: '',
       endDate: '',
       sessionsCount: null,
+      status: SubscriptionStatus.Active,
+      paymentMethod: PaymentMethod.Cash,
+      amount: null,
       notes: '',
     });
   }
@@ -281,6 +314,12 @@ export class ProjectComponent implements OnInit {
         formValue.sessionsCount === null || formValue.sessionsCount === ''
           ? null
           : Number(formValue.sessionsCount),
+      status: formValue.status ?? SubscriptionStatus.Active,
+      paymentMethod: formValue.paymentMethod ?? PaymentMethod.Cash,
+      amount:
+        formValue.amount === null || formValue.amount === ''
+          ? null
+          : Number(formValue.amount),
       notes: formValue.notes ?? '',
     });
   }
@@ -350,5 +389,28 @@ export class ProjectComponent implements OnInit {
       return '—';
     }
     return this.datePipe.transform(date, 'MMM d, y') ?? date;
+  }
+
+  statusLabel(status: string | null | undefined) {
+    return (
+      this.subscriptionStatuses.find((item) => item.value === status)?.label ??
+      status ??
+      '—'
+    );
+  }
+
+  paymentMethodLabel(method: string | null | undefined) {
+    return (
+      this.paymentMethods.find((item) => item.value === method)?.label ??
+      method ??
+      '—'
+    );
+  }
+
+  formattedAmount(amount: number | null | undefined) {
+    if (amount === null || amount === undefined || Number.isNaN(Number(amount))) {
+      return '—';
+    }
+    return `${Number(amount).toLocaleString('ar-EG')} ج.م`;
   }
 }

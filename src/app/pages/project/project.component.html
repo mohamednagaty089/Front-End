@@ -240,6 +240,87 @@
           </div>
         </div>
       </div>
+      <div class="md:col-span-1">
+        <p class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60" dir="rtl">
+          حالة الاشتراك
+        </p>
+        <div class="choice-field" role="radiogroup" aria-label="حالة الاشتراك">
+          <label
+            class="choice-field__option"
+            *ngFor="let status of subscriptionStatuses"
+            [class.is-selected]="subscriptionForm.get('status')?.value === status.value"
+          >
+            <input
+              type="radio"
+              formControlName="status"
+              [value]="status.value"
+              class="choice-field__input"
+            />
+            <span class="choice-field__dot" aria-hidden="true"></span>
+            <span class="choice-field__label">{{ status.label }}</span>
+          </label>
+        </div>
+      </div>
+      <div class="md:col-span-1">
+        <p class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60" dir="rtl">
+          طريقة الدفع
+        </p>
+        <div class="choice-field choice-field--payment" role="radiogroup" aria-label="طريقة الدفع">
+          <label
+            class="choice-field__option"
+            *ngFor="let method of paymentMethods"
+            [class.is-selected]="subscriptionForm.get('paymentMethod')?.value === method.value"
+          >
+            <input
+              type="radio"
+              formControlName="paymentMethod"
+              [value]="method.value"
+              class="choice-field__input"
+            />
+            <span class="choice-field__dot" aria-hidden="true"></span>
+            <span class="choice-field__label">{{ method.label }}</span>
+          </label>
+        </div>
+      </div>
+      <div class="md:col-span-2">
+        <label
+          for="amount"
+          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          dir="rtl"
+          >مبلغ الاشتراك</label
+        >
+        <div
+          class="amount-field"
+          [class.has-value]="subscriptionForm.get('amount')?.value != null && subscriptionForm.get('amount')?.value !== ''"
+        >
+          <div class="amount-field__glow" aria-hidden="true"></div>
+          <span class="amount-field__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="8"></circle>
+              <path d="M12 7v10"></path>
+              <path d="M9.5 9.5c.6-1 1.7-1.5 2.5-1.5s2 .7 2 2-1 2-2.5 2.5-2.5.8-2.5 2.5 1.1 2 2.5 2 2-.6 2.5-1.5"></path>
+            </svg>
+          </span>
+          <div class="amount-field__body">
+            <span class="amount-field__hint">أدخل مبلغ الاشتراك بالجنيه</span>
+            <div class="amount-field__input-row">
+              <input
+                id="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                formControlName="amount"
+                class="amount-field__input"
+                placeholder="0.00"
+              />
+              <span class="amount-field__currency">ج.م</span>
+            </div>
+          </div>
+          <div class="amount-field__preview" *ngIf="subscriptionForm.get('amount')?.value != null && subscriptionForm.get('amount')?.value !== ''">
+            {{ formattedAmount(subscriptionForm.get('amount')?.value) }}
+          </div>
+        </div>
+      </div>
       <div class="md:col-span-2">
         <label
           for="notes"
@@ -528,6 +609,97 @@
                 </div>
               </div>
             </div>
+            <div class="md:col-span-1">
+              <p
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
+                dir="rtl"
+              >
+                حالة الاشتراك
+              </p>
+              <div class="choice-field" role="radiogroup" aria-label="حالة الاشتراك">
+                <label
+                  class="choice-field__option"
+                  *ngFor="let status of subscriptionStatuses"
+                  [class.is-selected]="subscriptionForm.get('status')?.value === status.value"
+                >
+                  <input
+                    type="radio"
+                    formControlName="status"
+                    [value]="status.value"
+                    class="choice-field__input"
+                  />
+                  <span class="choice-field__dot" aria-hidden="true"></span>
+                  <span class="choice-field__label">{{ status.label }}</span>
+                </label>
+              </div>
+            </div>
+            <div class="md:col-span-1">
+              <p
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
+                dir="rtl"
+              >
+                طريقة الدفع
+              </p>
+              <div
+                class="choice-field choice-field--payment"
+                role="radiogroup"
+                aria-label="طريقة الدفع"
+              >
+                <label
+                  class="choice-field__option"
+                  *ngFor="let method of paymentMethods"
+                  [class.is-selected]="subscriptionForm.get('paymentMethod')?.value === method.value"
+                >
+                  <input
+                    type="radio"
+                    formControlName="paymentMethod"
+                    [value]="method.value"
+                    class="choice-field__input"
+                  />
+                  <span class="choice-field__dot" aria-hidden="true"></span>
+                  <span class="choice-field__label">{{ method.label }}</span>
+                </label>
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <label
+                for="edit-amount-{{ subscription.id }}"
+                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
+                dir="rtl"
+                >مبلغ الاشتراك</label
+              >
+              <div
+                class="amount-field"
+                [class.has-value]="subscriptionForm.get('amount')?.value != null && subscriptionForm.get('amount')?.value !== ''"
+              >
+                <div class="amount-field__glow" aria-hidden="true"></div>
+                <span class="amount-field__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="8"></circle>
+                    <path d="M12 7v10"></path>
+                    <path d="M9.5 9.5c.6-1 1.7-1.5 2.5-1.5s2 .7 2 2-1 2-2.5 2.5-2.5.8-2.5 2.5 1.1 2 2.5 2 2-.6 2.5-1.5"></path>
+                  </svg>
+                </span>
+                <div class="amount-field__body">
+                  <span class="amount-field__hint">أدخل مبلغ الاشتراك بالجنيه</span>
+                  <div class="amount-field__input-row">
+                    <input
+                      [id]="'edit-amount-' + subscription.id"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      formControlName="amount"
+                      class="amount-field__input"
+                      placeholder="0.00"
+                    />
+                    <span class="amount-field__currency">ج.م</span>
+                  </div>
+                </div>
+                <div class="amount-field__preview" *ngIf="subscriptionForm.get('amount')?.value != null && subscriptionForm.get('amount')?.value !== ''">
+                  {{ formattedAmount(subscriptionForm.get('amount')?.value) }}
+                </div>
+              </div>
+            </div>
             <div class="md:col-span-2">
               <label
                 for="edit-notes-{{ subscription.id }}"
@@ -604,6 +776,24 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">عدد الحصص</p>
               <p class="mt-1 text-base font-semibold text-white">
                 {{ subscription.sessionsCount ?? "—" }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">حالة الاشتراك</p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ statusLabel(subscription.status) }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/45">طريقة الدفع</p>
+              <p class="mt-1 text-base font-semibold text-white">
+                {{ paymentMethodLabel(subscription.paymentMethod) }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 sm:col-span-2">
+              <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/70">مبلغ الاشتراك</p>
+              <p class="mt-1 text-lg font-semibold text-emerald-100">
+                {{ formattedAmount(subscription.amount) }}
               </p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2">
