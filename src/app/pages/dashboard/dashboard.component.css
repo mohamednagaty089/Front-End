@@ -1,3 +1,295 @@
 :host {
   display: block;
 }
+
+.dashboard-page {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.dashboard-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.16), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.12), transparent 40%),
+    rgba(255, 255, 255, 0.04);
+  padding: 1.35rem 1.4rem;
+}
+
+.dashboard-hero__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: rgba(110, 231, 183, 0.85);
+}
+
+.dashboard-hero__title {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-weight: 800;
+  color: white;
+}
+
+.dashboard-hero__lead {
+  margin: 0.45rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dashboard-hero__refresh {
+  background: linear-gradient(135deg, #10b981, #0ea5e9);
+  color: white;
+}
+
+.dashboard-stats {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dash-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1.25rem;
+  box-shadow: 0 24px 60px rgba(8, 15, 35, 0.3);
+}
+
+.dash-card--total {
+  border-color: rgba(14, 165, 233, 0.3);
+  background:
+    linear-gradient(145deg, rgba(14, 165, 233, 0.18), rgba(14, 165, 233, 0.05)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.dash-card--active {
+  border-color: rgba(16, 185, 129, 0.35);
+  background:
+    linear-gradient(145deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.dash-card--expired {
+  border-color: rgba(251, 146, 60, 0.35);
+  background:
+    linear-gradient(145deg, rgba(251, 146, 60, 0.18), rgba(244, 63, 94, 0.06)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.dash-card__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.9rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #7dd3fc;
+}
+
+.dash-card--active .dash-card__icon {
+  color: #6ee7b7;
+}
+
+.dash-card--expired .dash-card__icon {
+  color: #fdba74;
+}
+
+.dash-card__icon svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.dash-card__label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dash-card__value {
+  margin: 0.45rem 0 0;
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}
+
+.dash-card__hint {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dashboard-secondary {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-secondary {
+    grid-template-columns: 1fr 1fr auto auto;
+    align-items: center;
+  }
+}
+
+.dash-mini {
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.9rem 1rem;
+}
+
+.dash-mini__label {
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dash-mini__value {
+  margin: 0.35rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: white;
+}
+
+.dash-link {
+  background: linear-gradient(135deg, #10b981, #0ea5e9) !important;
+  color: white !important;
+  justify-content: center;
+}
+
+.dash-link--outline {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dashboard-list-card {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1.2rem;
+  box-shadow: 0 24px 60px rgba(8, 15, 35, 0.28);
+}
+
+.dashboard-list-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-list-card__head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: white;
+}
+
+.dashboard-list-card__head p {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dashboard-list-card__head span {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.dashboard-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-list__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 0.85rem;
+}
+
+.dashboard-list__avatar {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #0ea5e9, #34d399);
+  font-weight: 700;
+  color: white;
+}
+
+.dashboard-list__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.dashboard-list__body strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: white;
+}
+
+.dashboard-list__body span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dashboard-list__status {
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dashboard-list__status.is-active {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(16, 185, 129, 0.15);
+  color: #a7f3d0;
+}
+
+.dashboard-list__status.is-expired {
+  border-color: rgba(251, 146, 60, 0.35);
+  background: rgba(251, 146, 60, 0.15);
+  color: #fdba74;
+}
+
+.dashboard-empty {
+  padding: 2rem 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+}

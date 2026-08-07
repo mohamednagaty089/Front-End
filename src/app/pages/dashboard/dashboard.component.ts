@@ -1,227 +1,152 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MasterService } from '../../service/master.service';
-import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
-import { Employee } from '../../model/class/Employee';
+import { MemberService } from '../../service/memberService';
+import {
+  MemberSubscription,
+  SubscriptionStatus,
+} from '../../model/class/MemberSubscription';
+import { Member } from '../../model/class/Member';
+import { ApiResponse } from '@/app/service/genericService';
+import { RouterLink } from '@angular/router';
+import { UbButtonDirective } from '@/app/components/ui/button';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule], // Import CommonModule here
+  imports: [CommonModule, RouterLink, UbButtonDirective],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  dashboardData: any = {
-    totalEmployee: 0,
-    totalProject: 0,
-    activeProjectEmployees: 0,
-    recentProjects: [],
-    recentEmployee: [],
-  };
-  parentDepartments: IParentDept[] = [];
+  private readonly memberService = inject(MemberService);
 
-  // Statistics data
-  projects: IProject[] = [];
-  employees: Employee[] = [];
-  projectEmployees: IProjectEmployee[] = [];
+  private readonly subscriptionsSignal = signal<MemberSubscription[]>([]);
+  private readonly membersSignal = signal<Member[]>([]);
+  readonly isLoading = signal(true);
 
-  // Calculated statistics
-  projectStats: {
-    nonArchived: number;
-    archived: number;
-    active: number;
-    inactive: number;
-    planning: number;
-    assigned: number;
-    nonAssigned: number;
-    activeAssignments: number;
-    inactiveAssignments: number;
-  } = {
-    nonArchived: 0,
-    archived: 0,
-    active: 0,
-    inactive: 0,
-    planning: 0,
-    assigned: 0,
-    nonAssigned: 0,
-    activeAssignments: 0,
-    inactiveAssignments: 0,
-  };
+  readonly totalSubscriptions = computed(() => this.subscriptionsSignal().length);
 
-  constructor(private masterService: MasterService) {}
+  readonly activeSubscriptions = computed(() =>
+    this.subscriptionsSignal().filter((item) => this.isActiveSubscription(item))
+      .length
+  );
+
+  readonly expiredSubscriptions = computed(() =>
+    this.subscriptionsSignal().filter((item) => this.isExpiredSubscription(item))
+      .length
+  );
+
+  readonly totalMembers = computed(() => this.membersSignal().length);
+
+  readonly recentSubscriptions = computed(() =>
+    [...this.subscriptionsSignal()]
+      .sort((a, b) => {
+        const dateA = new Date(a.startDate || 0).getTime();
+        const dateB = new Date(b.startDate || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 6)
+  );
 
   ngOnInit(): void {
-    this.getDashboardData();
-    this.getParentDepartments();
-    this.loadStatisticsData();
+    this.loadDashboardData();
   }
 
-  getDashboardData() {
-    this.masterService.getDashboardData().subscribe((data: any) => {
-      this.dashboardData = data;
-    });
-  }
+  loadDashboardData() {
+    this.isLoading.set(true);
+    let subscriptionsDone = false;
+    let membersDone = false;
 
-  getParentDepartments() {
-    this.masterService.getAllDept().subscribe((response) => {
-      if (response?.result && Array.isArray(response.data)) {
-        this.parentDepartments = response.data;
-      } else if (Array.isArray(response)) {
-        // in case API returns array directly
-        this.parentDepartments = response as unknown as IParentDept[];
-      }
-    });
-  }
-
-  loadStatisticsData(): void {
-    let projectsLoaded = false;
-    let employeesLoaded = false;
-    let projectEmployeesLoaded = false;
-
-    const checkAndCalculate = () => {
-      if (projectsLoaded && employeesLoaded && projectEmployeesLoaded) {
-        this.calculateProjectStatistics();
+    const finish = () => {
+      if (subscriptionsDone && membersDone) {
+        this.isLoading.set(false);
       }
     };
 
-    // Load projects, employees, and project-employees in parallel
-    this.masterService.getAllProjects().subscribe({
-      next: (projects) => {
-        this.projects = projects;
-        projectsLoaded = true;
-        checkAndCalculate();
+    this.memberService.getAllMemberSubscriptions().subscribe({
+      next: (res: ApiResponse<MemberSubscription[]>) => {
+        const list = (res?.data ?? []).map(
+          (item) => new MemberSubscription(item)
+        );
+        this.subscriptionsSignal.set(list);
+        subscriptionsDone = true;
+        finish();
       },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load projects', error);
-        this.projects = [];
-        projectsLoaded = true;
-        checkAndCalculate();
-      },
-    });
-
-    this.masterService.getAllEmp().subscribe({
-      next: (employees) => {
-        this.employees = employees;
-        employeesLoaded = true;
-        checkAndCalculate();
-      },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load employees', error);
-        this.employees = [];
-        employeesLoaded = true;
-        checkAndCalculate();
+      error: () => {
+        this.subscriptionsSignal.set([]);
+        subscriptionsDone = true;
+        finish();
       },
     });
 
-    this.masterService.getProjectEmp().subscribe({
-      next: (projectEmployees) => {
-        this.projectEmployees = projectEmployees;
-        projectEmployeesLoaded = true;
-        checkAndCalculate();
+    this.memberService.getTopTenMembers().subscribe({
+      next: (res: ApiResponse<Member[]>) => {
+        this.membersSignal.set(res?.data ?? []);
+        membersDone = true;
+        finish();
       },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load project employees', error);
-        this.projectEmployees = [];
-        projectEmployeesLoaded = true;
-        checkAndCalculate();
+      error: () => {
+        this.membersSignal.set([]);
+        membersDone = true;
+        finish();
       },
     });
   }
 
-  calculateProjectStatistics(): void {
-    if (!this.projects.length) {
-      return;
-    }
-
-    // Separate archived projects
-    const archivedProjects = this.projects.filter(
-      (p) => p.archivedAt != null && p.archivedAt !== ''
-    );
-    const nonArchivedProjects = this.projects.filter(
-      (p) => !p.archivedAt || p.archivedAt === ''
-    );
-
-    // Filter to only active assignments
-    const activeProjectEmployees = this.projectEmployees.filter(
-      (pe) =>
-        pe.isActive === 'Y' ||
-        pe.isActive === 'y' ||
-        pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true'
-    );
-
-    // Get project IDs with active assignments
-    const projectIdsWithActiveAssignments = new Set(
-      activeProjectEmployees.map((pe) => pe.projectId)
-    );
-
-    // Categorize non-archived projects
-    const activeProjects: IProject[] = [];
-    const inactiveProjects: IProject[] = [];
-    const planningProjects: IProject[] = [];
-    const assignedProjects: IProject[] = [];
-    const nonAssignedProjects: IProject[] = [];
-
-    nonArchivedProjects.forEach((p) => {
-      const hasActiveAssignments = projectIdsWithActiveAssignments.has(p.projectId);
-      const hasLead = p.leadByEmpId != null;
-
-      // Assigned vs Non-assigned
-      if (hasActiveAssignments) {
-        assignedProjects.push(p);
-      } else {
-        nonAssignedProjects.push(p);
-      }
-
-      // Active vs Inactive vs Planning
-      if (hasActiveAssignments) {
-        // Has active assignments = Active
-        activeProjects.push(p);
-      } else if (hasLead) {
-        // Has lead but no active assignments = Planning/Startup
-        planningProjects.push(p);
-        activeProjects.push(p); // Planning projects are also considered "active"
-      } else {
-        // No lead and no active assignments = Inactive
-        inactiveProjects.push(p);
-      }
-    });
-
-    // Calculate active and inactive assignments
-    const activeAssignmentsCount = this.projectEmployees.filter((pe) =>
-      this.isActive(pe.isActive)
-    ).length;
-    const inactiveAssignmentsCount =
-      this.projectEmployees.length - activeAssignmentsCount;
-
-    // Update statistics
-    this.projectStats = {
-      nonArchived: nonArchivedProjects.length,
-      archived: archivedProjects.length,
-      active: activeProjects.length,
-      inactive: inactiveProjects.length,
-      planning: planningProjects.length,
-      assigned: assignedProjects.length,
-      nonAssigned: nonAssignedProjects.length,
-      activeAssignments: activeAssignmentsCount,
-      inactiveAssignments: inactiveAssignmentsCount,
-    };
+  memberDisplayName(subscription: MemberSubscription): string {
+    return subscription.member?.fullName || 'مشترك بدون اسم';
   }
 
-  // Helper method to check if assignment is active (matching project-employee component logic)
-  private isActive(value: string | boolean | null | undefined): boolean {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') {
-      return ['y', 'yes', 'true', '1'].includes(value.toLowerCase());
+  statusLabel(subscription: MemberSubscription): string {
+    if (this.isExpiredSubscription(subscription)) {
+      return 'منتهي';
     }
-    return false;
+    if (subscription.status === SubscriptionStatus.Pending) {
+      return 'قيد الانتظار';
+    }
+    if (subscription.status === SubscriptionStatus.Suspended) {
+      return 'موقوف';
+    }
+    if (this.isActiveSubscription(subscription)) {
+      return 'نشط';
+    }
+    return 'غير محدد';
   }
 
-  getDepartmentLogo(logo: string): string {
-    if (!logo) {
-      return '';
+  private isActiveSubscription(subscription: MemberSubscription): boolean {
+    if (subscription.status === SubscriptionStatus.Active) {
+      return !this.hasEnded(subscription.endDate);
     }
-    return logo.startsWith('/') ? logo : `/${logo}`;
+    if (subscription.status === SubscriptionStatus.Expired) {
+      return false;
+    }
+    // Fallback: treat non-expired by endDate as active when status missing
+    return (
+      !!subscription.endDate &&
+      !this.hasEnded(subscription.endDate) &&
+      subscription.status !== SubscriptionStatus.Suspended &&
+      subscription.status !== SubscriptionStatus.Pending
+    );
+  }
+
+  private isExpiredSubscription(subscription: MemberSubscription): boolean {
+    if (subscription.status === SubscriptionStatus.Expired) {
+      return true;
+    }
+    return this.hasEnded(subscription.endDate);
+  }
+
+  private hasEnded(endDate: string | null | undefined): boolean {
+    if (!endDate) {
+      return false;
+    }
+    const end = new Date(endDate);
+    if (Number.isNaN(end.getTime())) {
+      return false;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    return end < today;
   }
 }
