@@ -1,3 +1,5 @@
+import { Member } from "./Member";
+
 export enum SubscriptionStatus {
   Active = 'Active',
   Pending = 'Pending',
@@ -14,9 +16,9 @@ export enum PaymentMethod {
 }
 
 export class MemberSubscription {
-  id: number;
-  memberId: number;
-  memberName: string;
+  id: number|undefined;
+  member: Member|undefined;
+  // memberName: string;
   startDate: string;
   endDate: string;
   sessionsCount: number | null;
@@ -26,9 +28,9 @@ export class MemberSubscription {
   notes: string;
 
   constructor(data?: Partial<MemberSubscription>) {
-    this.id = data?.id ?? 0;
-    this.memberId = data?.memberId ?? 0;
-    this.memberName = data?.memberName ?? '';
+    this.id = data?.id ?? undefined;
+    this.member = data?.member ?? undefined;
+    // this.memberName = data?.memberName ?? '';
     this.startDate = data?.startDate ?? '';
     this.endDate = data?.endDate ?? '';
     this.sessionsCount = data?.sessionsCount ?? null;

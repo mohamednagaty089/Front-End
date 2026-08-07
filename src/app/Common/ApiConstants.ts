@@ -33,7 +33,7 @@ export class ApiConstants {
     MEMBERS_BARCODE: (id: number) => `members/barCode/${id}`,
 
     // Member subscription endpoints
-    MEMBER_SUBSCRIPTIONS: 'member-subscriptions',
+    MEMBER_SUBSCRIPTIONS: 'membersSubscription',
     MEMBER_SUBSCRIPTIONS_ADD: 'add',
     MEMBER_SUBSCRIPTIONS_UPDATE: 'update',
     MEMBER_SUBSCRIPTIONS_DELETE: 'delete',

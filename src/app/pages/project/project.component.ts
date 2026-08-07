@@ -67,7 +67,7 @@ export class ProjectComponent implements OnInit {
     }
     return this.subscriptions().filter((subscription) => {
       return (
-        subscription.memberName?.toLowerCase().includes(term) ||
+        subscription.member?.fullName?.toLowerCase().includes(term) ||
         subscription.startDate?.toLowerCase().includes(term) ||
         subscription.endDate?.toLowerCase().includes(term) ||
         subscription.notes?.toLowerCase().includes(term) ||
@@ -187,8 +187,7 @@ export class ProjectComponent implements OnInit {
 
     this.subscriptionForm.patchValue({
       id: subscription.id ?? null,
-      memberId: subscription.memberId ?? null,
-      memberName: subscription.memberName ?? '',
+      member:subscription.member,
       startDate: subscription.startDate
         ? String(subscription.startDate).substring(0, 10)
         : '',
@@ -214,7 +213,7 @@ export class ProjectComponent implements OnInit {
       this.pendingDelete = null;
       return;
     }
-    const { id, memberName } = this.pendingDelete;
+    const { id, member } = this.pendingDelete;
     this.isDeleting = true;
     this.memberService.deleteMemberSubscription(id).subscribe({
       next: () => {
@@ -225,7 +224,7 @@ export class ProjectComponent implements OnInit {
         );
         this.toast.success({
           title: 'تم الحذف',
-          description: `تم حذف اشتراك ${memberName} بنجاح.`,
+          description: `تم حذف اشتراك ${member?.fullName} بنجاح.`,
         });
         if (this.expandedSubscriptionId === id) {
           this.expandedSubscriptionId = null;
@@ -305,9 +304,17 @@ export class ProjectComponent implements OnInit {
   private buildMemberSubscription(): MemberSubscription {
     const formValue = this.subscriptionForm.getRawValue();
     return new MemberSubscription({
-      id: formValue.id ?? 0,
-      memberId: Number(formValue.memberId),
-      memberName: formValue.memberName ?? '',
+      id: formValue.id ?? undefined,
+      member:{
+        id: Number(formValue.memberId), fullName: formValue.memberName ?? '',
+        phone: '',
+        email: '',
+        memberType: undefined,
+        address: '',
+        nationalId: '',
+        birthDate: undefined,
+        barcodeId: ''
+      },
       startDate: formValue.startDate ?? '',
       endDate: formValue.endDate ?? '',
       sessionsCount:

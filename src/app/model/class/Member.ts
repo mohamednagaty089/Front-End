@@ -9,10 +9,10 @@ export class Member {
   phone: string;
   fullName: string;
   email: string;
-  memberType: MemberType;
+  memberType: MemberType|undefined;
   address: string;
   nationalId: string;
-  birthDate: Date;
+  birthDate: Date|undefined;
   barcodeId: string;
 
   constructor(data?: Partial<Member>) {
