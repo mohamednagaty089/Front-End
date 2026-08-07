@@ -1,0 +1,31 @@
+src/app/pages/login/login.component.css
+  s_941acfe98e913a::t_39bb8b896a0554 96-149
+  s_941acfe98e913a::t_f46a287715a37b 3,6,8-13,17-95,150-255,258-266,268-275,294-303,306-307,312,322-424,441-449,452-456
+  s_941acfe98e913a::t_e4a1d361a2e14b 304-305,308-311,313-321
+  s_941acfe98e913a::t_eec24d954151b4 276-293
+  s_941acfe98e913a::t_71fae46130920f 425-440
+src/app/pages/login/login.component.ts
+  s_941acfe98e913a::t_5db1ab7abcc170 35,41-42,45-46,49-50,78-79,83-84
+src/app/pages/login/login.component.html
+  s_941acfe98e913a::t_f3e1381ef54781 18-21,42-45,54
+  s_941acfe98e913a::t_ed112dca0d6066 3,5,9-17,22-32,34-35,37-41,52-53,55-68,70-73,76-87,89-100,102-107,109-115
+  s_941acfe98e913a::t_041d47ce753411 47-51
+public/gym-logo.svg
+  s_941acfe98e913a::t_307d521990036c 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "88762ab394a361c803479bc0b4f6e242764e9a99",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
