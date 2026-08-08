@@ -64,16 +64,40 @@ export class EmployeeComponent implements OnInit {
     private toast: ToastService
   ) {
     this.memberForm = this.fb.group({
-      fullName: ['', Validators.required],
+      fullName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          // Arabic letters only, must not start with a space or special character
+          Validators.pattern(/^[\u0621-\u064A][\u0621-\u064A\s]*$/),
+        ],
+      ],
       email: ['', Validators.email],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: [
+        '',
+        [Validators.required, Validators.pattern(/^01[0-9]{9}$/)],
+      ],
       address: [''],
       membershipType: [''],
       code: [''],
-      nationalId: [''],
+      nationalId: ['', Validators.pattern(/^[0-9]{14}$/)],
       birthDate: [''],
-      
     });
+  }
+
+  isInvalid(controlName: string): boolean {
+    const control = this.memberForm.get(controlName);
+    return !!control && control.invalid && (control.touched || control.dirty);
+  }
+
+  hasError(controlName: string, error: string): boolean {
+    const control = this.memberForm.get(controlName);
+    return (
+      !!control &&
+      control.hasError(error) &&
+      (control.touched || control.dirty)
+    );
   }
 
   ngOnInit(): void {
@@ -225,6 +249,14 @@ export class EmployeeComponent implements OnInit {
   }
 
   updateMember(id:number) {
+    if (this.memberForm.invalid) {
+      this.memberForm.markAllAsTouched();
+      this.toast.error({
+        title: 'بيانات غير صالحة',
+        message: 'يرجى تصحيح الحقول المميزة قبل الحفظ.',
+      });
+      return;
+    }
     if (this.memberForm.valid && !this.isSaving) {
       const member = this.buildMemberPayload();
       this.isSaving = true;
@@ -326,6 +358,14 @@ export class EmployeeComponent implements OnInit {
   }
 
   saveMember() {
+    if (this.memberForm.invalid) {
+      this.memberForm.markAllAsTouched();
+      this.toast.error({
+        title: 'بيانات غير صالحة',
+        message: 'يرجى تصحيح الحقول المميزة قبل الحفظ.',
+      });
+      return;
+    }
     if (this.memberForm.valid && !this.isSaving) {
       const member = this.buildMemberPayload();
       const barcodeId = `eeeee-33${member.memberType}`;
