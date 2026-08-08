@@ -1,0 +1,28 @@
+src/app/pages/employee/employee.component.ts
+  s_941acfe98e913a::t_e8c6c0af48928b 67-75,77-80,84,89-102
+  s_941acfe98e913a::t_99249591f02487 361-368
+  s_941acfe98e913a::t_b3daad78547efb 252-259
+src/app/pages/employee/employee.component.html
+  s_941acfe98e913a::t_0a7f1fef7b924f 162,454
+  s_941acfe98e913a::t_ceb0ab3ca6a7c9 87,379
+  s_941acfe98e913a::t_dcd5a4989eca17 108,400
+  s_941acfe98e913a::t_eb16b281b6a038 127,419
+  s_941acfe98e913a::t_2cfefbb5180e2f 86,89-93,107,110-113,126,129-131,378,381-385,399,402-405,418,421-423
+  s_941acfe98e913a::t_e323596954e98d 161,164-166,453,456-458
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "8f885133d2c6d9fe09fcb6c1ac9da40278ad00cd",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
