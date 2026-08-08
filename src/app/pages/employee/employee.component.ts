@@ -52,6 +52,25 @@ export class EmployeeComponent implements OnInit {
   });
 
   readonly searchTerm = signal<string>('');
+
+  readonly pageSize = signal<number>(5);
+  readonly currentPage = signal<number>(1);
+
+  readonly totalPages = computed(() => {
+    const total = this.filteredMembers().length;
+    return Math.max(1, Math.ceil(total / this.pageSize()));
+  });
+
+  readonly pagedMembers = computed(() => {
+    const page = Math.min(this.currentPage(), this.totalPages());
+    const start = (page - 1) * this.pageSize();
+    return this.filteredMembers().slice(start, start + this.pageSize());
+  });
+
+  readonly pageNumbers = computed(() =>
+    Array.from({ length: this.totalPages() }, (_, i) => i + 1)
+  );
+
   expandedEmployeeId: number | null = null;
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
@@ -313,6 +332,20 @@ export class EmployeeComponent implements OnInit {
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
+    this.currentPage.set(1);
+  }
+
+  goToPage(page: number) {
+    const target = Math.min(Math.max(1, page), this.totalPages());
+    this.currentPage.set(target);
+  }
+
+  nextPage() {
+    this.goToPage(this.currentPage() + 1);
+  }
+
+  prevPage() {
+    this.goToPage(this.currentPage() - 1);
   }
 
   private normalizePayload(raw: any): Employee {
