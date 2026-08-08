@@ -12,8 +12,8 @@ export class Member {
   memberType: MemberType|undefined;
   address: string;
   nationalId: string;
-  birthDate: Date|undefined;
-  barcodeId: string;
+  joinDate: Date|undefined;
+  code: string;
 
   constructor(data?: Partial<Member>) {
     this.phone = data?.phone ?? '';
@@ -23,7 +23,7 @@ export class Member {
     this.address = data?.address ?? '';
     this.id = data?.id ?? undefined;
     this.nationalId = data?.nationalId ?? '';
-    this.birthDate = data?.birthDate ?? new Date();
-    this.barcodeId = data?.barcodeId ?? '';
+    this.joinDate = data?.joinDate ?? new Date();
+    this.code = data?.code ?? '';
   }
 }

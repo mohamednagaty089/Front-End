@@ -203,7 +203,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
         id: `${member.id}-${now}`,
         memberId: member.id,
         memberName: member.fullName,
-        barcodeId: member.barcodeId || code,
+        barcodeId: member.code || code,
         scannedAt: new Date().toISOString(),
         status: 'duplicate',
       };
@@ -220,7 +220,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
       id: `${member.id}-${now}`,
       memberId: member.id,
       memberName: member.fullName,
-      barcodeId: member.barcodeId || code,
+      barcodeId: member.code || code,
       scannedAt: new Date().toISOString(),
       status: 'present',
     };
@@ -237,7 +237,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
   private findMemberByCode(code: string): Member | undefined {
     const normalized = code.trim().toLowerCase();
     return this.members().find((member) => {
-      const barcode = member.barcodeId?.trim().toLowerCase();
+      const barcode = member.code?.trim().toLowerCase();
       const idMatch = String(member.id) === code.trim();
       const nameMatch = member.fullName?.trim().toLowerCase() === normalized;
       return barcode === normalized || idMatch || nameMatch;

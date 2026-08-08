@@ -15,9 +15,11 @@ import { ToastService } from '@/app/components/ui/toast.service';
 import { ApiResponse } from '@/app/service/genericService';
 
 export enum SubscriptionType {
-  Vip = 'vip',
-  Regular = 'regular',
-  Staff = 'staff',
+
+    vip="عضوية VIP",
+    regular= "عضوية عادية",
+    staff="عضوية الموظفين",
+    lesson="حصه"
 }
 
 @Component({
@@ -82,7 +84,7 @@ export class EmployeeComponent implements OnInit {
       membershipType: [''],
       code: [''],
       nationalId: ['', Validators.pattern(/^[0-9]{14}$/)],
-      birthDate: [''],
+      joinDate: [''],
     });
   }
 
@@ -179,7 +181,9 @@ export class EmployeeComponent implements OnInit {
       // emailId: member.emailId ?? '',
       // location: member.location ?? '',
       // timezone: employee.timezone ?? '',
-      birthDate: formatDateForInput(member.birthDate?.toString()),
+      joinDate: formatDateForInput(member.joinDate?.toString()),
+      code: member.code ?? '',
+      address: member.address ?? '',
       // skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
       // tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
     });
@@ -200,7 +204,7 @@ export class EmployeeComponent implements OnInit {
       // emailId: member.emailId ?? '',
       // location: member.location ?? '',
       // timezone: employee.timezone ?? '',
-      birthDate: '',
+      joinDate: '',
       // skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
       // tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
     });
@@ -368,15 +372,15 @@ export class EmployeeComponent implements OnInit {
     }
     if (this.memberForm.valid && !this.isSaving) {
       const member = this.buildMemberPayload();
-      const barcodeId = `eeeee-33${member.memberType}`;
-      member.barcodeId = barcodeId;
+      // const barcodeId = `eeeee-33${member.memberType}`;
+      // member.barcodeId = barcodeId;
       this.isSaving = true;
 
       this.memberService.createMember(member).subscribe(
         (res) => {
           this.isSaving = false;
           this.getMembers();
-          const successBarcode = res?.data?.barcodeId ?? barcodeId;
+          const successBarcode = res?.data?.code ??res?.data?.code?? '';
           this.toast.success({
             title: 'تم الحفظ',
             message: `تم إنشاء العضو الجديد بنجاح. الرمز: ${successBarcode}`,
@@ -404,6 +408,10 @@ export class EmployeeComponent implements OnInit {
       memberType:
         (formValue.membershipType as MemberType) ?? MemberType.Regular,
       address: formValue.address ?? '',
+      nationalId: formValue.nationalId ?? '',
+      joinDate: formValue.joinDate ? new Date(formValue.joinDate) : undefined,
+      code: formValue.code ?? '',
     });
   }
+   
 }

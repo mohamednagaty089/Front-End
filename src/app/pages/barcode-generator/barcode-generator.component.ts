@@ -40,7 +40,7 @@ export class BarcodeGeneratorComponent implements OnInit {
       (member) =>
         member.fullName?.toLowerCase().includes(term) ||
         member.phone?.toLowerCase().includes(term) ||
-        member.barcodeId?.toLowerCase().includes(term)
+        member.code?.toLowerCase().includes(term)
     );
   });
 
@@ -169,7 +169,7 @@ export class BarcodeGeneratorComponent implements OnInit {
     }
 
     const link = document.createElement('a');
-    const safeName = (member?.fullName || member?.barcodeId || 'barcode')
+    const safeName = (member?.fullName || member?.code || 'barcode')
       .replace(/[^\w\u0600-\u06FF\-]+/g, '_')
       .slice(0, 40);
     link.href = src;

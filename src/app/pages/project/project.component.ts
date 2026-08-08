@@ -312,8 +312,8 @@ export class ProjectComponent implements OnInit {
         memberType: undefined,
         address: '',
         nationalId: '',
-        birthDate: undefined,
-        barcodeId: ''
+        joinDate: undefined,
+        code: ''
       },
       startDate: formValue.startDate ?? '',
       endDate: formValue.endDate ?? '',

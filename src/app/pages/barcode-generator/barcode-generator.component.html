@@ -44,8 +44,8 @@
               <span class="barcode-dropdown__hint" *ngIf="!selectedMember()">
                 من قائمة المشتركين
               </span>
-              <span class="barcode-dropdown__hint" *ngIf="selectedMember()?.barcodeId">
-                {{ selectedMember()?.barcodeId }}
+              <span class="barcode-dropdown__hint" *ngIf="selectedMember()?.code">
+                {{ selectedMember()?.code }}
               </span>
             </span>
             <span class="barcode-dropdown__chevron" aria-hidden="true"></span>
@@ -86,7 +86,7 @@
             <span class="barcode-dropdown__option-body">
               <span class="barcode-dropdown__option-name">{{ member.fullName }}</span>
               <span class="barcode-dropdown__option-meta">
-                {{ member.barcodeId || member.phone || '—' }}
+                {{ member.code || member.phone || '—' }}
               </span>
             </span>
             <span
@@ -162,7 +162,7 @@
       <div class="barcode-preview__meta" *ngIf="selectedMember() as member">
         <div>
           <span>كود الباركود</span>
-          <strong>{{ member.barcodeId || '—' }}</strong>
+          <strong>{{ member.code || '—' }}</strong>
         </div>
         <div>
           <span>رقم المشترك</span>
