@@ -1,0 +1,23 @@
+src/app/pages/employee/employee.component.ts
+  s_941acfe98e913a::t_239a1a91d8416c 335-348
+  s_941acfe98e913a::t_e1e221517df1a8 55-73
+src/app/pages/employee/employee.component.html
+  s_941acfe98e913a::t_14771e03accd5d 300
+  s_941acfe98e913a::t_dca962042efb4e 741-779
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "b0b199efcf74d93114615852884c3d57a186cc11",
+  "prompts": {},
+  "sessions": {
+    "s_941acfe98e913a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "be51806e-651b-4b2e-9fe1-e07c1dac9ca3",
+        "model": "default"
+      },
+      "human_author": "Mohamed.Nagaty <mohamed.nagaty@fawry.com>"
+    }
+  }
+}
