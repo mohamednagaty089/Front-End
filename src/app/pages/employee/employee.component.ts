@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { ApiResponse } from '@/app/service/genericService';
+import { SearchRequest } from '@/app/model/class/SearchRequest';
 
 export enum SubscriptionType {
 
@@ -34,7 +35,7 @@ export class EmployeeComponent implements OnInit {
   memberForm: FormGroup;
 
 
-  private readonly membersSignal = signal<Member[]>([]);
+  private  membersSignal = signal<Member[]>([]);
   readonly members = this.membersSignal.asReadonly();
   readonly subscriptionTypes = Object.values(SubscriptionType) as SubscriptionType[];
 
@@ -54,21 +55,26 @@ export class EmployeeComponent implements OnInit {
   readonly searchTerm = signal<string>('');
 
   readonly pageSize = signal<number>(5);
-  readonly currentPage = signal<number>(1);
+  readonly currentPage = signal<number>(0);
 
-  readonly totalPages = computed(() => {
-    const total = this.filteredMembers().length;
-    return Math.max(1, Math.ceil(total / this.pageSize()));
-  });
+  readonly totalPages = signal<number>(1);
 
   readonly pagedMembers = computed(() => {
-    const page = Math.min(this.currentPage(), this.totalPages());
-    const start = (page - 1) * this.pageSize();
-    return this.filteredMembers().slice(start, start + this.pageSize());
+    const members = this.filteredMembers();
+    const size = this.pageSize();
+    // If the members array already contains a single page (server-side paging),
+    // return it directly. Otherwise, slice for client-side paging.
+    if (members.length <= size) {
+      return members;
+    }
+    const maxIndex = Math.max(0, this.totalPages() - 1);
+    const page = Math.min(Math.max(0, this.currentPage()), maxIndex);
+    const start = page * size;
+    return members.slice(start, start + size);
   });
 
   readonly pageNumbers = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, i) => i + 1)
+    Array.from({ length: this.totalPages() }, (_, i) => i)
   );
 
   expandedEmployeeId: number | null = null;
@@ -126,9 +132,18 @@ export class EmployeeComponent implements OnInit {
   }
 
   getMembers() {
-    this.memberService.getTopTenMembers().subscribe((res: ApiResponse<Member[]>) => {
-      const members = res?.data ?? [];
+  
+    const searchRequest: SearchRequest = new SearchRequest({
+      page: this.currentPage(),
+      size: this.pageSize(),
+      searchValue: this.searchTerm(),
+      sortDirection: 'desc',
+    });
+    this.memberService.getMembers(searchRequest).subscribe((res: ApiResponse<any>) => {
+      const members = res?.data?.content ?? [];
       this.membersSignal.set(members);
+      // this.currentPage.set(searchRequest.page ?? 1);
+      this.totalPages.set(res?.data?.totalPages ?? 1);
       if (!this.expandedEmployeeId && members.length) {
         this.expandedEmployeeId = members[0].id ?? null;
       }
@@ -332,12 +347,16 @@ export class EmployeeComponent implements OnInit {
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
-    this.currentPage.set(1);
+    this.currentPage.set(0);
+    this.getMembers();
   }
 
   goToPage(page: number) {
     const target = Math.min(Math.max(1, page), this.totalPages());
-    this.currentPage.set(target);
+    console.log(`Navigating to page: ${target}`,page);
+    this.currentPage.set(page);
+
+    this.getMembers();
   }
 
   nextPage() {
@@ -346,6 +365,7 @@ export class EmployeeComponent implements OnInit {
 
   prevPage() {
     this.goToPage(this.currentPage() - 1);
+
   }
 
   private normalizePayload(raw: any): Employee {

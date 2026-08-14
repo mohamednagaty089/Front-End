@@ -745,12 +745,12 @@
       class="flex flex-col items-center justify-between gap-4 rounded-[26px] border border-white/10 bg-white/5/70 px-6 py-4 text-sm text-white/70 shadow-[0_20px_60px_rgba(10,15,35,0.4)] backdrop-blur-xl sm:flex-row"
     >
       <span class="text-xs text-white/55">
-        صفحة {{ currentPage() }} من {{ totalPages() }}
+        صفحة {{ currentPage() + 1 }} من {{ totalPages() }}
       </span>
       <div class="flex items-center gap-2">
         <button
           type="button"
-          [disabled]="currentPage() === 1"
+          [disabled]="currentPage() === 0"
           class="rounded-xl border border-white/15 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           (click)="prevPage()"
         >
@@ -765,11 +765,11 @@
             : 'border-white/15 text-white/70 hover:border-white/40 hover:text-white'"
           class="min-w-[2.25rem] rounded-xl border px-3 py-2 text-xs font-semibold transition"
         >
-          {{ page }}
+          {{ page + 1 }}
         </button>
         <button
           type="button"
-          [disabled]="currentPage() === totalPages()"
+          [disabled]="currentPage() === totalPages() - 1"
           class="rounded-xl border border-white/15 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           (click)="nextPage()"
         >

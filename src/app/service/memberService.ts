@@ -6,6 +6,7 @@ import { ApiResponse, GenericService } from './genericService';
 import { ApiConstants } from '../Common/ApiConstants';
 import { Member } from '../model/class/Member';
 import { MemberSubscription } from '../model/class/MemberSubscription';
+import { SearchRequest } from '../model/class/SearchRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,11 @@ export class MemberService extends GenericService<Member> {
   getTopTenMembers(): Observable<ApiResponse<Member[]>> {
     const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.MEMBERS_GET_TO_TEN}`;
     return this.get<Member[]>(endpoint);
+  }
+
+  getMembers(searchRequest:SearchRequest): Observable<ApiResponse<Member[]>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.MEMBERS_SEARCH}`;
+    return this.Search<SearchRequest,Member[]>(endpoint,searchRequest);
   }
 
   updateMember(id: number, member: Member): Observable<ApiResponse<Member>> {

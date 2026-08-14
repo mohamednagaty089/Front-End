@@ -20,7 +20,7 @@ export class ApiConstants {
     
     // Member endpoints
     MEMBERS: 'members',
-    MEMBERS_SEARCH: 'members/search',
+    MEMBERS_SEARCH: 'search',
     MEMBERS_ADD: 'add',
     MEMBERS_UPDATE: 'update',
     MEMBERS_DELETE: 'delete',
