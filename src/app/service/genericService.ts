@@ -68,6 +68,14 @@ export class GenericService<T> {
       );
   }
 
+      scan<T,s>(endpoint: string, item: T): Observable<ApiResponse<s>> {
+    return this.http.post<ApiResponse<s>>(this.getUrl(endpoint), item)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+
   // CREATE
   create<T>(endpoint: string, item: T): Observable<ApiResponse<T>> {
     return this.http.post<ApiResponse<T>>(this.getUrl(endpoint), item)

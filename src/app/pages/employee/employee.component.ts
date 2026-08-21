@@ -58,6 +58,7 @@ export class EmployeeComponent implements OnInit {
   readonly currentPage = signal<number>(0);
 
   readonly totalPages = signal<number>(1);
+   readonly totalItems = signal<number>(1);
 
   readonly pagedMembers = computed(() => {
     const members = this.filteredMembers();
@@ -144,6 +145,7 @@ export class EmployeeComponent implements OnInit {
       this.membersSignal.set(members);
       // this.currentPage.set(searchRequest.page ?? 1);
       this.totalPages.set(res?.data?.totalPages ?? 1);
+      this.totalItems.set(res?.data?.totalElements ?? members.length);
       if (!this.expandedEmployeeId && members.length) {
         this.expandedEmployeeId = members[0].id ?? null;
       }

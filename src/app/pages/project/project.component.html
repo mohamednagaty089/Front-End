@@ -64,26 +64,26 @@
               id="project-name"
               type="button"
               class="member-dropdown__trigger"
-              [class.has-value]="!!selectedMemberLabel"
+              [class.has-value]="!!selectedMember?.fullName"
               (click)="toggleMemberDropdown($event)"
               [attr.aria-expanded]="memberDropdownOpen()"
               aria-haspopup="listbox"
             >
               <span class="member-dropdown__avatar" aria-hidden="true">
-                {{ selectedMemberLabel ? selectedMemberLabel.charAt(0) : 'م' }}
+                {{ selectedMember?.fullName ? selectedMember?.fullName: 'م' }}
               </span>
               <span class="member-dropdown__text">
                 <span class="member-dropdown__value">
-                  {{ selectedMemberLabel || 'اختر المشترك' }}
+                  {{ selectedMember?.fullName || 'اختر المشترك' }}
                 </span>
-                <span class="member-dropdown__hint" *ngIf="!selectedMemberLabel">
+                <span class="member-dropdown__hint" *ngIf="!selectedMember?.fullName">
                   من قائمة المشتركين
                 </span>
               </span>
               <span class="member-dropdown__chevron" aria-hidden="true"></span>
             </button>
             <button
-              *ngIf="selectedMemberLabel"
+              *ngIf="selectedMember?.fullName"
               type="button"
               class="member-dropdown__clear"
               (click)="clearMember($event)"
@@ -103,8 +103,8 @@
               class="member-dropdown__option"
               *ngFor="let member of members()"
               role="option"
-              [attr.aria-selected]="selectedMemberLabel === member.fullName"
-              [class.is-selected]="selectedMemberLabel === member.fullName"
+              [attr.aria-selected]="selectedMember?.fullName === member.fullName"
+              [class.is-selected]="selectedMember?.fullName === member.fullName"
               (click)="selectMember(member)"
             >
               <span class="member-dropdown__option-avatar" aria-hidden="true">
@@ -118,7 +118,7 @@
               </span>
               <span
                 class="member-dropdown__check"
-                *ngIf="selectedMemberLabel === member.fullName"
+                *ngIf="selectedMember?.fullName === member.fullName"
                 aria-hidden="true"
                 >✓</span
               >
@@ -391,7 +391,7 @@
           <span
             class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:mr-4 md:mt-0"
           >
-            {{ subscription.sessionsCount ?? 0 }} حصة
+            {{ subscription.lessonsCount ?? 0 }} حصة
           </span>
         </div>
         <div class="flex items-center gap-3">
@@ -433,26 +433,26 @@
                     [id]="'edit-member-' + subscription.id"
                     type="button"
                     class="member-dropdown__trigger"
-                    [class.has-value]="!!selectedMemberLabel"
+                    [class.has-value]="!!selectedMember?.fullName"
                     (click)="toggleMemberDropdown($event)"
                     [attr.aria-expanded]="memberDropdownOpen()"
                     aria-haspopup="listbox"
                   >
                     <span class="member-dropdown__avatar" aria-hidden="true">
-                      {{ selectedMemberLabel ? selectedMemberLabel.charAt(0) : 'م' }}
+                      {{ selectedMember ? selectedMember?.fullName?.charAt(0) : 'م' }}
                     </span>
                     <span class="member-dropdown__text">
                       <span class="member-dropdown__value">
-                        {{ selectedMemberLabel || 'اختر المشترك' }}
+                        {{ selectedMember?.fullName || 'اختر المشترك' }}
                       </span>
-                      <span class="member-dropdown__hint" *ngIf="!selectedMemberLabel">
+                      <span class="member-dropdown__hint" *ngIf="!selectedMember?.fullName">
                         من قائمة المشتركين
                       </span>
                     </span>
                     <span class="member-dropdown__chevron" aria-hidden="true"></span>
                   </button>
                   <button
-                    *ngIf="selectedMemberLabel"
+                    *ngIf="selectedMember?.fullName"
                     type="button"
                     class="member-dropdown__clear"
                     (click)="clearMember($event)"
@@ -472,12 +472,12 @@
                     class="member-dropdown__option"
                     *ngFor="let member of members()"
                     role="option"
-                    [attr.aria-selected]="selectedMemberLabel === member.fullName"
-                    [class.is-selected]="selectedMemberLabel === member.fullName"
+                    [attr.aria-selected]="selectedMember?.fullName === member.fullName"
+                    [class.is-selected]="selectedMember?.fullName === member.fullName"
                     (click)="selectMember(member)"
                   >
                     <span class="member-dropdown__option-avatar" aria-hidden="true">
-                      {{ member.fullName?.charAt(0) || 'م' }}
+                      {{ selectedMember?.fullName?.charAt(0)|| 'م' }}
                     </span>
                     <span class="member-dropdown__option-body">
                       <span class="member-dropdown__option-name">{{ member.fullName }}</span>
@@ -487,7 +487,7 @@
                     </span>
                     <span
                       class="member-dropdown__check"
-                      *ngIf="selectedMemberLabel === member.fullName"
+                      *ngIf="selectedMember?.fullName === member.fullName"
                       aria-hidden="true"
                       >✓</span
                     >
@@ -775,7 +775,7 @@
             <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">عدد الحصص</p>
               <p class="mt-1 text-base font-semibold text-white">
-                {{ subscription.sessionsCount ?? "—" }}
+                {{ subscription.lessonsCount ?? "—" }}
               </p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">

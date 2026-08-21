@@ -21,7 +21,7 @@ export class MemberSubscription {
   // memberName: string;
   startDate: string;
   endDate: string;
-  sessionsCount: number | null;
+  lessonsCount: number | null;
   status: SubscriptionStatus;
   paymentMethod: PaymentMethod;
   amount: number | null;
@@ -33,7 +33,7 @@ export class MemberSubscription {
     // this.memberName = data?.memberName ?? '';
     this.startDate = data?.startDate ?? '';
     this.endDate = data?.endDate ?? '';
-    this.sessionsCount = data?.sessionsCount ?? null;
+    this.lessonsCount = data?.lessonsCount ?? null;
     this.status = data?.status ?? SubscriptionStatus.Active;
     this.paymentMethod = data?.paymentMethod ?? PaymentMethod.Cash;
     this.amount = data?.amount ?? null;

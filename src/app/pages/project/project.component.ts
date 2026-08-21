@@ -44,6 +44,7 @@ export class ProjectComponent implements OnInit {
   readonly members = this.membersSignal.asReadonly();
   readonly searchTerm = signal<string>('');
   readonly memberDropdownOpen = signal(false);
+   selectedMember: Member | undefined = undefined;
 
   readonly subscriptionStatuses = [
     { value: SubscriptionStatus.Active, label: 'نشط' },
@@ -73,7 +74,9 @@ export class ProjectComponent implements OnInit {
         subscription.notes?.toLowerCase().includes(term) ||
         subscription.status?.toLowerCase().includes(term) ||
         subscription.paymentMethod?.toLowerCase().includes(term) ||
-        String(subscription.sessionsCount ?? '').includes(term)
+        String(subscription.lessonsCount ?? '').includes(term)||
+        String(subscription.amount ?? '').includes(term)
+
       );
     });
   });
@@ -138,7 +141,7 @@ export class ProjectComponent implements OnInit {
   }
 
   getMembers() {
-    this.memberService.getTopTenMembers().subscribe((res: ApiResponse<Member[]>) => {
+    this.memberService.getAllActiveMembers().subscribe((res: ApiResponse<Member[]>) => {
       this.membersSignal.set(res?.data ?? []);
     });
   }
@@ -149,6 +152,8 @@ export class ProjectComponent implements OnInit {
   }
 
   selectMember(member: Member) {
+
+    this.selectedMember=member;
     this.subscriptionForm.patchValue({
       memberId: member.id,
       memberName: member.fullName,
@@ -177,9 +182,11 @@ export class ProjectComponent implements OnInit {
 
   onEdit(id: number) {
     const subscription = this.subscriptions().find((item) => item.id === id);
+    console.log('subscription', subscription);
     if (!subscription) {
       return;
     }
+    this.selectedMember=subscription.member ?? undefined;
     this.memberDropdownOpen.set(false);
     this.showCreatePanel = false;
     this.editingSubscriptionId = id;
@@ -194,7 +201,7 @@ export class ProjectComponent implements OnInit {
       endDate: subscription.endDate
         ? String(subscription.endDate).substring(0, 10)
         : '',
-      sessionsCount: subscription.sessionsCount ?? null,
+      sessionsCount: subscription.lessonsCount ?? null,
       status: subscription.status ?? SubscriptionStatus.Active,
       paymentMethod: subscription.paymentMethod ?? PaymentMethod.Cash,
       amount: subscription.amount ?? null,
@@ -305,19 +312,10 @@ export class ProjectComponent implements OnInit {
     const formValue = this.subscriptionForm.getRawValue();
     return new MemberSubscription({
       id: formValue.id ?? undefined,
-      member:{
-        id: Number(formValue.memberId), fullName: formValue.memberName ?? '',
-        phone: '',
-        email: '',
-        memberType: undefined,
-        address: '',
-        nationalId: '',
-        joinDate: undefined,
-        code: ''
-      },
+      member:this.selectedMember,
       startDate: formValue.startDate ?? '',
       endDate: formValue.endDate ?? '',
-      sessionsCount:
+      lessonsCount:
         formValue.sessionsCount === null || formValue.sessionsCount === ''
           ? null
           : Number(formValue.sessionsCount),

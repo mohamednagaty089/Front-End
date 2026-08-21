@@ -25,6 +25,7 @@ export class ApiConstants {
     MEMBERS_UPDATE: 'update',
     MEMBERS_DELETE: 'delete',
     MEMBERS_GET_TO_TEN:'getAll',
+    GET_ALL_ACTIVE_MEMBERS: 'getAllActive',
     MEMBERS_OVERDUE: 'members/overdue',
     MEMBERS_STATS: 'members/stats',
     MEMBERS_EXPORT: 'members/export-csv',
@@ -43,6 +44,15 @@ export class ApiConstants {
     EMPLOYEES: '/employees',
     EMPLOYEES_DEPARTMENT: '/employees/department',
     EMPLOYEES_POSITION: '/employees/position',
+
+    
+    // ATTANDENCE endpoints
+    ATTANDENCE: 'attendance',
+    ATTANDENCE_CHECKIN: 'attandence/checkin',
+    ATTANDENCE_CHECKOUT: 'attandence/checkout', 
+    SCAN: 'scan',
+  
+    
     
 
     

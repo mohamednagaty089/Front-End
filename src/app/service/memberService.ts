@@ -26,6 +26,12 @@ export class MemberService extends GenericService<Member> {
     return this.get<Member[]>(endpoint);
   }
 
+   getAllActiveMembers(): Observable<ApiResponse<Member[]>> {
+    const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.GET_ALL_ACTIVE_MEMBERS}`;
+    return this.get<Member[]>(endpoint);
+  }
+
+
   getMembers(searchRequest:SearchRequest): Observable<ApiResponse<Member[]>> {
     const endpoint = `${ApiConstants.ENDPOINTS.MEMBERS}/${ApiConstants.ENDPOINTS.MEMBERS_SEARCH}`;
     return this.Search<SearchRequest,Member[]>(endpoint,searchRequest);

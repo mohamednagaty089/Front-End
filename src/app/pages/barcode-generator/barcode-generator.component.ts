@@ -68,7 +68,7 @@ export class BarcodeGeneratorComponent implements OnInit {
   }
 
   loadMembers() {
-    this.memberService.getTopTenMembers().subscribe({
+    this.memberService.getAllActiveMembers().subscribe({
       next: (res: ApiResponse<Member[]>) => {
         this.members.set(res?.data ?? []);
       },
@@ -88,6 +88,7 @@ export class BarcodeGeneratorComponent implements OnInit {
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
+
   }
 
   selectMember(member: Member) {
