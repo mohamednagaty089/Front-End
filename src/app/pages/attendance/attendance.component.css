@@ -311,6 +311,18 @@
     rgba(255, 255, 255, 0.04);
 }
 
+.attendance-result.is-error {
+  background:
+    linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(127, 29, 29, 0.12)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.attendance-result__message {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .attendance-result.is-empty {
   background: rgba(255, 255, 255, 0.04);
 }
@@ -461,6 +473,15 @@
 
 .attendance-log__item.is-duplicate .attendance-log__time em {
   color: #fdba74;
+}
+
+.attendance-log__item.is-error {
+  border-color: rgba(244, 63, 94, 0.28);
+  background: rgba(244, 63, 94, 0.1);
+}
+
+.attendance-log__item.is-error .attendance-log__time em {
+  color: #fda4af;
 }
 
 .attendance-log__empty {

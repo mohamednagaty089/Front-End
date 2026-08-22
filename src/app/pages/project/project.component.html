@@ -70,7 +70,7 @@
               aria-haspopup="listbox"
             >
               <span class="member-dropdown__avatar" aria-hidden="true">
-                {{ selectedMember?.fullName ? selectedMember?.fullName: 'م' }}
+                {{ selectedMember?.fullName ? selectedMember?.fullName?.charAt(0): 'م' }}
               </span>
               <span class="member-dropdown__text">
                 <span class="member-dropdown__value">
@@ -376,7 +376,7 @@
 
   <section class="space-y-4">
     <div
-      *ngFor="let subscription of filteredSubscriptions()"
+      *ngFor="let subscription of pagedSubscriptions()"
       class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
@@ -823,8 +823,16 @@
       </div>
     </div>
 
-    <div
-      *ngIf="!filteredSubscriptions().length"
+    <div *ngIf="filteredSubscriptions().length" dir="rtl" class="flex flex-col items-center justify-between gap-4 rounded-[26px] border border-white/10 bg-white/5/70 px-6 py-4 text-sm text-white/70 shadow-[0_20px_60px_rgba(10,15,35,0.4)] backdrop-blur-xl sm:flex-row mt-4">
+      <span class="text-xs text-white/55">صفحة {{ currentPage() + 1 }} من {{ totalPages() }}</span>
+      <div class="flex items-center gap-2">
+        <button type="button" [disabled]="currentPage() === 0" class="rounded-xl border border-white/15 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40" (click)="prevPage()">السابق</button>
+        <button *ngFor="let page of pageNumbers()" type="button" (click)="goToPage(page)" [ngClass]="page === currentPage() ? 'border-primary/60 bg-primary/20 text-white shadow-[0_10px_30px_rgba(59,130,246,0.3)]' : 'border-white/15 text-white/70 hover:border-white/40 hover:text-white'" class="min-w-[2.25rem] rounded-xl border px-3 py-2 text-xs font-semibold transition">{{ page + 1 }}</button>
+        <button type="button" [disabled]="currentPage() === totalPages() - 1" class="rounded-xl border border-white/15 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40" (click)="nextPage()">التالي</button>
+      </div>
+    </div>
+
+    <div *ngIf="!filteredSubscriptions().length"
       class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
       لا توجد اشتراكات مطابقة للبحث.

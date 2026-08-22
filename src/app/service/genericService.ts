@@ -30,7 +30,8 @@ export class GenericService<T> {
 
   private handleError(error: any): Observable<never> {
     console.error('API Error:', error);
-    return throwError(() => new Error(error.message || 'Server error'));
+    // Rethrow the original error (HttpErrorResponse) so callers can inspect status codes
+    return throwError(() => error);
   }
 
   // GET all with pagination and filtering

@@ -20,9 +20,11 @@ import {
   SubscriptionStatus,
 } from '../../model/class/MemberSubscription';
 import { DatePipe, CommonModule } from '@angular/common';
+import { ApiConstants } from '../../Common/ApiConstants';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ApiResponse } from '@/app/service/genericService';
+import { SearchRequest } from '@/app/model/class/SearchRequest';
 
 @Component({
   selector: 'app-project',
@@ -81,6 +83,24 @@ export class ProjectComponent implements OnInit {
     });
   });
 
+  // Pagination signals
+  readonly pageSize = signal<number>(5);
+  readonly currentPage = signal<number>(0);
+  readonly totalPages = signal<number>(1);
+  readonly totalItems = signal<number>(0);
+
+  readonly pagedSubscriptions = computed(() => {
+    const subs = this.filteredSubscriptions();
+    const size = this.pageSize();
+    if (subs.length <= size) return subs;
+    const maxIndex = Math.max(0, this.totalPages() - 1);
+    const page = Math.min(Math.max(0, this.currentPage()), maxIndex);
+    const start = page * size;
+    return subs.slice(start, start + size);
+  });
+
+  readonly pageNumbers = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i));
+
   get selectedMemberLabel(): string {
     const value = this.subscriptionForm.get('memberName')?.value;
     return value ? String(value) : '';
@@ -120,12 +140,31 @@ export class ProjectComponent implements OnInit {
   }
 
   getSubscriptions() {
+
+    const searchRequest: SearchRequest = new SearchRequest({
+          page: this.currentPage(),
+          size: this.pageSize(),
+          searchValue: this.searchTerm(),
+          sortDirection: 'desc',
+        });
+        this.memberService.getMemberSubscription(searchRequest).subscribe((res: ApiResponse<any>) => {
+          const memberSubscriptions = res?.data?.content ?? [];
+          this.subscriptionsSignal.set(memberSubscriptions);
+          // this.currentPage.set(searchRequest.page ?? 1);
+          this.totalPages.set(res?.data?.totalPages ?? 1);
+          this.totalItems.set(res?.data?.totalElements ?? memberSubscriptions.length);
+          if (!this.expandedSubscriptionId && memberSubscriptions.length) {
+            this.expandedSubscriptionId = memberSubscriptions[0].id ?? null;
+          }
+        });
     this.memberService.getAllMemberSubscriptions().subscribe({
       next: (res: ApiResponse<MemberSubscription[]>) => {
         const list = (res?.data ?? []).map(
           (item) => new MemberSubscription(item)
         );
         this.subscriptionsSignal.set(list);
+        this.totalItems.set(list.length);
+        this.totalPages.set(Math.max(1, Math.ceil(list.length / this.pageSize())));
         if (!this.expandedSubscriptionId && list.length) {
           this.expandedSubscriptionId = list[0].id ?? null;
         }
@@ -306,6 +345,22 @@ export class ProjectComponent implements OnInit {
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
+    this.currentPage.set(0);
+    this.getSubscriptions();
+  }
+
+  goToPage(page: number) {
+    const target = Math.min(Math.max(0, page), Math.max(0, this.totalPages() - 1));
+    this.currentPage.set(target);
+    this.getSubscriptions();
+  }
+
+  nextPage() {
+    this.goToPage(this.currentPage() + 1);
+  }
+
+  prevPage() {
+    this.goToPage(this.currentPage() - 1);
   }
 
   private buildMemberSubscription(): MemberSubscription {
@@ -368,7 +423,19 @@ export class ProjectComponent implements OnInit {
         });
     } else {
       this.memberService.createMemberSubscription(subscription).subscribe({
-        next: () => {
+        next: (res:any) => {
+          const status = res?.statusCode ?? null;
+          if (status === ApiConstants.STATUS.CONFLICT) {
+            this.toast.error({
+              title: 'اشتراك موجود',
+              description: 'اشترك ساري',
+            });
+             this.showCreatePanel = false;
+             this.selectedMember=undefined;
+             this.subscriptionForm.reset();
+             this.cancelEdit();
+            return;
+          }
           this.isSaving = false;
           this.getSubscriptions();
           this.toast.success({
@@ -378,8 +445,11 @@ export class ProjectComponent implements OnInit {
           this.showCreatePanel = false;
           this.cancelEdit();
         },
-        error: () => {
+        error: (err: any) => {
           this.isSaving = false;
+          // If backend returns 409 Conflict, show specific message
+      
+
           this.toast.error({
             title: 'فشل الحفظ',
             description: 'تعذر حفظ الاشتراك حالياً.',

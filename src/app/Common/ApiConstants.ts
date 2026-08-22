@@ -51,6 +51,7 @@ export class ApiConstants {
     ATTANDENCE_CHECKIN: 'attandence/checkin',
     ATTANDENCE_CHECKOUT: 'attandence/checkout', 
     SCAN: 'scan',
+    GET_ACTIVE_MEMBER_COUNT: 'getDailyAttendanceCount',
   
     
     
@@ -64,7 +65,9 @@ HEADERS: {
     BEARER: 'Bearer '
   },
   
- STATUS : {
+
+  }
+  static readonly  STATUS ={
     OK: 200,
     CREATED: 201,
     ACCEPTED: 202,
@@ -73,7 +76,17 @@ HEADERS: {
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    CONFLICT: 409,
     INTERNAL_SERVER: 500
   }
-  }
+
+  static readonly ATTENDANCE_SCAN = {
+    SUCCESS: 'SUCCESS',
+    DUPLICATE: 'DUPLICATE',
+    NO_SUBSCRIPTION: 'NO_SUBSCRIPTION',
+    MEMBER_NOT_FOUND: 'MEMBER_NOT_FOUND',
+    LIMIT_REACHED: 'LIMIT_REACHED',
+    INVALID_FORMAT: 'INVALID_FORMAT',
+    ERROR: 'ERROR',
+  } as const
 }

@@ -15,7 +15,12 @@ export class AttendanceService extends GenericService<Member> {
 
     takeAttendance(barcode: string |undefined): Observable<ApiResponse<Member>> {
       const endpoint = `${ApiConstants.ENDPOINTS.ATTANDENCE}/${ApiConstants.ENDPOINTS.SCAN}`;
-      return this.scan(endpoint, { barcode });
+      return this.scan(endpoint, barcode ?? '');
+    }
+
+    getDailyAttendanceCount(): Observable<ApiResponse<number>> {
+      const endpoint = `${ApiConstants.ENDPOINTS.ATTANDENCE}/${ApiConstants.ENDPOINTS.GET_ACTIVE_MEMBER_COUNT}`;
+      return this.get<number>(endpoint);
     }
   
 }

@@ -82,7 +82,7 @@
             id="manual-code"
             type="text"
             [(ngModel)]="manualCode"
-            (keyup.enter)="submitManualCode()"
+            autocomplete="off"
             placeholder="ألصق أو اكتب كود الـ QR / الباركود"
             class="attendance-manual__input"
           />
@@ -103,14 +103,13 @@
       <article
         class="attendance-result"
         *ngIf="lastResult() as result; else emptyResult"
-        [class.is-duplicate]="result.status === 'duplicate'"
+        [ngClass]="resultToneClass(result.status)"
       >
-        <p class="attendance-result__label">
-          {{ result.status === 'present' ? 'تم التسجيل' : 'مسجل مسبقاً' }}
-        </p>
+        <p class="attendance-result__label">{{ resultLabel(result.status) }}</p>
         <h3>{{ result.memberName }}</h3>
         <p class="attendance-result__meta">{{ result.barcodeId }}</p>
         <p class="attendance-result__time">{{ formattedTime(result.scannedAt) }}</p>
+        <p class="attendance-result__message" *ngIf="result.message">{{ result.message }}</p>
       </article>
       <ng-template #emptyResult>
         <article class="attendance-result is-empty">
@@ -140,7 +139,7 @@
           <li
             *ngFor="let item of attendanceLog()"
             class="attendance-log__item"
-            [class.is-duplicate]="item.status === 'duplicate'"
+            [ngClass]="resultToneClass(item.status)"
           >
             <div class="attendance-log__avatar" aria-hidden="true">
               {{ item.memberName?.charAt(0) || 'م' }}
@@ -151,7 +150,7 @@
             </div>
             <div class="attendance-log__time">
               <span>{{ formattedTime(item.scannedAt) }}</span>
-              <em>{{ item.status === 'present' ? 'حاضر' : 'مكرر' }}</em>
+              <em>{{ resultLabel(item.status) }}</em>
             </div>
           </li>
         </ul>
