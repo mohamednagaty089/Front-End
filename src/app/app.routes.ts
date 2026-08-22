@@ -64,6 +64,14 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'today-attendance',
+        loadComponent: () => import('./pages/attendance-today/attendance-today.component').then(m => m.AttendanceTodayComponent),
+        data: {
+          layout: 'private',
+          pageTitle: 'Today Attendance',
+        },
+      },
+      {
         path: 'barcode',
         component: BarcodeGeneratorComponent,
         data: {

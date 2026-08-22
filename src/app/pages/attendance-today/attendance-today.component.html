@@ -1,0 +1,26 @@
+<div class="attendance-today p-6" dir="rtl">
+  <header class="flex items-center justify-between mb-4">
+    <div>
+      <h2 class="text-lg font-semibold text-white">حضور اليوم</h2>
+      <p class="text-sm text-white/60">عدد الحضور الناجحين: {{ successCount() }}</p>
+    </div>
+    <div>
+      <button ubButton size="sm" (click)="loadToday()" [disabled]="loading()">تحديث</button>
+    </div>
+  </header>
+
+  <div *ngIf="loading()" class="text-white/70">جاري التحميل...</div>
+  <div *ngIf="error()" class="text-rose-300">{{ error() }}</div>
+
+  <ul *ngIf="!loading() && !error() && records().length" class="space-y-2">
+    <li *ngFor="let r of records()" class="p-3 rounded-lg bg-white/5 flex items-center justify-between">
+      <div>
+        <div class="font-semibold text-white">{{ r.fullName || '—' }}</div>
+        <div class="text-xs text-white/60">{{r.address || '—' }}</div>
+      </div>
+      <!-- <div class="text-sm" [ngClass]="{ 'text-emerald-200': r.status === 'SUCCESS', 'text-yellow-300': r.status === 'DUPLICATE', 'text-rose-300': r.status !== 'SUCCESS' }">{{ r.status }}</div> -->
+    </li>
+  </ul>
+
+  <div *ngIf="!loading() && !error() && !records().length" class="text-white/60">لا توجد تسجيلات اليوم.</div>
+</div>

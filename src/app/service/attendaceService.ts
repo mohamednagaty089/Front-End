@@ -22,5 +22,10 @@ export class AttendanceService extends GenericService<Member> {
       const endpoint = `${ApiConstants.ENDPOINTS.ATTANDENCE}/${ApiConstants.ENDPOINTS.GET_ACTIVE_MEMBER_COUNT}`;
       return this.get<number>(endpoint);
     }
+
+    getTodayAttendances(): Observable<ApiResponse<Member[]>> {
+      const endpoint = `${ApiConstants.ENDPOINTS.ATTANDENCE}/getDailyAttendanceMember`;
+      return this.get<Member[]>(endpoint);
+    }
   
 }
